@@ -145,7 +145,7 @@ export default function PostsList() {
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors">
-                        Post id {post.id}
+                        Post {post.id}
                       </CardTitle>
                       <Badge variant="outline" className="shrink-0 text-xs">
                         #{post.Post_id || post.id}
