@@ -47,47 +47,6 @@ export type Database = {
         }
         Relationships: []
       }
-      post_comments: {
-        Row: {
-          comment_date: string | null
-          created_at: string
-          id: number
-          linkedin_title: string | null
-          linkedin_url: string | null
-          person_name: string | null
-          post_id: number
-          received_dm: boolean | null
-        }
-        Insert: {
-          comment_date?: string | null
-          created_at?: string
-          id?: number
-          linkedin_title?: string | null
-          linkedin_url?: string | null
-          person_name?: string | null
-          post_id: number
-          received_dm?: boolean | null
-        }
-        Update: {
-          comment_date?: string | null
-          created_at?: string
-          id?: number
-          linkedin_title?: string | null
-          linkedin_url?: string | null
-          person_name?: string | null
-          post_id?: number
-          received_dm?: boolean | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "post_comments_post_id_fkey"
-            columns: ["post_id"]
-            isOneToOne: false
-            referencedRelation: "Posts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       Posts: {
         Row: {
           Caption: string | null
@@ -129,7 +88,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_post_comments_table: {
+        Args: { post_id_param: number }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
