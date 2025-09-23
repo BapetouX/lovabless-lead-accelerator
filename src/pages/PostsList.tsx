@@ -97,10 +97,13 @@ export default function PostsList() {
         return;
       }
 
-      // Mettre à jour le post
+      // Mettre à jour le post avec table_exist = true et le nom de la table
       const { error: updateError } = await supabase
         .from('Posts')
-        .update({ table_exist: true })
+        .update({ 
+          table_exist: true,
+          comments_table_name: result.table_name 
+        })
         .eq('id', postId);
 
       if (updateError) {

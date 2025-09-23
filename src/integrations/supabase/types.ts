@@ -83,6 +83,7 @@ export type Database = {
       Posts: {
         Row: {
           Caption: string | null
+          comments_table_name: string | null
           created_at: string
           id: number
           keyword: string | null
@@ -94,6 +95,7 @@ export type Database = {
         }
         Insert: {
           Caption?: string | null
+          comments_table_name?: string | null
           created_at: string
           id?: number
           keyword?: string | null
@@ -105,6 +107,7 @@ export type Database = {
         }
         Update: {
           Caption?: string | null
+          comments_table_name?: string | null
           created_at?: string
           id?: number
           keyword?: string | null
