@@ -69,13 +69,54 @@ export default function PostsList() {
 
   const handleCreateTable = async (postId: number) => {
     try {
-      const { error } = await supabase
+      const tableName = `post_comments_${postId}`;
+      
+      // Créer la table dynamiquement via SQL
+      const { error: sqlError } = await supabase.rpc('exec_sql', {
+        sql: `
+          CREATE TABLE IF NOT EXISTS public.${tableName} (
+            id BIGSERIAL PRIMARY KEY,
+            post_id BIGINT NOT NULL DEFAULT ${postId},
+            received_dm BOOLEAN DEFAULT FALSE,
+            comment_date TIMESTAMPTZ,
+            person_name TEXT,
+            linkedin_title TEXT,
+            linkedin_url TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+          );
+          
+          ALTER TABLE public.${tableName} ENABLE ROW LEVEL SECURITY;
+          
+          CREATE POLICY IF NOT EXISTS "Public can read ${tableName}"
+          ON public.${tableName}
+          FOR SELECT
+          USING (true);
+          
+          CREATE POLICY IF NOT EXISTS "Public can insert ${tableName}"
+          ON public.${tableName}
+          FOR INSERT
+          WITH CHECK (true);
+        `
+      });
+
+      if (sqlError) {
+        console.error('SQL Error:', sqlError);
+        toast({
+          title: "Erreur",
+          description: "Impossible de créer la table",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Mettre à jour le post
+      const { error: updateError } = await supabase
         .from('Posts')
         .update({ table_exist: true })
         .eq('id', postId);
 
-      if (error) {
-        console.error('Update error:', error);
+      if (updateError) {
+        console.error('Update error:', updateError);
         toast({
           title: "Erreur",
           description: "Impossible de marquer la table comme créée",
@@ -92,8 +133,8 @@ export default function PostsList() {
       ));
 
       toast({
-        title: "Table activée",
-        description: "Le post est maintenant prêt pour recevoir des commentaires",
+        title: "Table créée",
+        description: `Table ${tableName} créée avec succès`,
       });
     } catch (error) {
       console.error('Erreur:', error);
