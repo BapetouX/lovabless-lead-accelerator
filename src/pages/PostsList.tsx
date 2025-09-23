@@ -6,11 +6,14 @@ import { ExternalLink, Database, BarChart3, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-interface Post {
+type Post = {
   id: number;
   Post_id: number | null;
   Caption: string | null;
   created_at: string;
+  table_exist?: boolean | null;
+  keyword?: string | null;
+  post_url?: string | null;
 }
 
 export default function PostsList() {
@@ -48,7 +51,7 @@ export default function PostsList() {
         return;
       }
 
-      setPosts(data || []);
+      setPosts((data as Post[]) || []);
     } catch (error) {
       console.error('Erreur:', error);
       toast({
@@ -61,12 +64,41 @@ export default function PostsList() {
     }
   };
 
-  const handleCreateTable = (postId: number) => {
-    console.log(`Création de table pour le post ${postId}`);
-    toast({
-      title: "Fonctionnalité à venir",
-      description: "La création de table sera bientôt disponible",
-    });
+  const handleCreateTable = async (postId: number) => {
+    try {
+      const { error } = await supabase
+        .from('Posts')
+        .update({ table_exist: true } as any)
+        .eq('id', postId);
+
+      if (error) {
+        toast({
+          title: "Erreur",
+          description: "Impossible de créer la table",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Mettre à jour l'état local
+      setPosts(posts.map(post => 
+        post.id === postId 
+          ? { ...post, table_exist: true }
+          : post
+      ));
+
+      toast({
+        title: "Table créée",
+        description: "La table a été créée avec succès",
+      });
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue",
+        variant: "destructive",
+      });
+    }
   };
 
 
@@ -127,15 +159,22 @@ export default function PostsList() {
               </CardHeader>
               
               <CardContent className="pt-0">
-                <Button 
-                  variant="default" 
-                  size="sm"
-                  className="w-full bg-blue-500/70 hover:bg-blue-500/90 text-white border-0 animate-fade-in"
-                  onClick={() => handleCreateTable(post.id)}
-                >
-                  <Database className="h-4 w-4 mr-2" />
-                  Créer une table
-                </Button>
+                {post.table_exist ? (
+                  <Badge variant="secondary" className="w-full justify-center py-2">
+                    <Database className="h-4 w-4 mr-2" />
+                    Table créée
+                  </Badge>
+                ) : (
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    className="w-full bg-blue-500/70 hover:bg-blue-500/90 text-white border-0 animate-fade-in"
+                    onClick={() => handleCreateTable(post.id)}
+                  >
+                    <Database className="h-4 w-4 mr-2" />
+                    Créer une table
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))}
