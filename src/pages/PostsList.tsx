@@ -69,13 +69,6 @@ export default function PostsList() {
     });
   };
 
-  const handleViewData = (postId: number) => {
-    console.log(`Affichage des données du post ${postId}`);
-    toast({
-      title: "Fonctionnalité à venir", 
-      description: "La visualisation des données sera bientôt disponible",
-    });
-  };
 
   if (loading) {
     return (
@@ -106,46 +99,43 @@ export default function PostsList() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
-            <Card key={post.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2">
-                    <CardTitle className="text-lg line-clamp-2">
-                      {post.Caption || `Post #${post.Post_id || post.id}`}
+            <Card key={post.id} className="group hover:shadow-lg transition-all duration-300 hover-scale">
+              <CardHeader className="pb-4">
+                <div className="space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-lg font-semibold line-clamp-3 group-hover:text-primary transition-colors">
+                      {post.Caption?.slice(0, 100) || `Post LinkedIn`}
+                      {post.Caption && post.Caption.length > 100 && "..."}
                     </CardTitle>
-                    <CardDescription>
-                      Créé le {new Date(post.created_at).toLocaleDateString('fr-FR')}
-                      {post.Post_id && ` • ID LinkedIn: ${post.Post_id}`}
-                    </CardDescription>
+                    <Badge variant="outline" className="shrink-0 text-xs">
+                      #{post.Post_id || post.id}
+                    </Badge>
                   </div>
-                  <Badge variant="secondary">
-                    Pas de table
-                  </Badge>
+                  
+                  <CardDescription className="flex items-center gap-2 text-sm">
+                    <span className="text-muted-foreground">
+                      {new Date(post.created_at).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                    </span>
+                  </CardDescription>
                 </div>
               </CardHeader>
               
-              <CardContent>
-                <div className="flex items-center gap-3">
-                  <Button 
-                    variant="secondary" 
-                    size="sm"
-                    onClick={() => handleCreateTable(post.id)}
-                  >
-                    <Database className="h-4 w-4 mr-2" />
-                    Créer table
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleViewData(post.id)}
-                  >
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    Voir les données
-                  </Button>
-                </div>
+              <CardContent className="pt-0">
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  className="w-full bg-blue-500/70 hover:bg-blue-500/90 text-white border-0 animate-fade-in"
+                  onClick={() => handleCreateTable(post.id)}
+                >
+                  <Database className="h-4 w-4 mr-2" />
+                  Créer une table
+                </Button>
               </CardContent>
             </Card>
           ))}
