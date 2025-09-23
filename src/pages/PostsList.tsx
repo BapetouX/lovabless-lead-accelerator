@@ -20,6 +20,14 @@ export default function PostsList() {
 
   useEffect(() => {
     fetchPosts();
+    
+    // Rafraîchissement automatique toutes les minutes
+    const interval = setInterval(() => {
+      fetchPosts();
+    }, 60000); // 60000ms = 1 minute
+
+    // Nettoyage de l'interval au démontage du composant
+    return () => clearInterval(interval);
   }, []);
 
   const fetchPosts = async () => {
