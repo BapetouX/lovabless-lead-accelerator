@@ -69,41 +69,29 @@ export default function PostsList() {
 
   const handleCreateTable = async (postId: number) => {
     try {
-      const tableName = `post_comments_${postId}`;
-      
-      // Créer la table dynamiquement via SQL
-      const { error: sqlError } = await supabase.rpc('exec_sql', {
-        sql: `
-          CREATE TABLE IF NOT EXISTS public.${tableName} (
-            id BIGSERIAL PRIMARY KEY,
-            post_id BIGINT NOT NULL DEFAULT ${postId},
-            received_dm BOOLEAN DEFAULT FALSE,
-            comment_date TIMESTAMPTZ,
-            person_name TEXT,
-            linkedin_title TEXT,
-            linkedin_url TEXT,
-            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-          );
-          
-          ALTER TABLE public.${tableName} ENABLE ROW LEVEL SECURITY;
-          
-          CREATE POLICY IF NOT EXISTS "Public can read ${tableName}"
-          ON public.${tableName}
-          FOR SELECT
-          USING (true);
-          
-          CREATE POLICY IF NOT EXISTS "Public can insert ${tableName}"
-          ON public.${tableName}
-          FOR INSERT
-          WITH CHECK (true);
-        `
+      // Appeler la fonction RPC pour créer la table
+      const { data, error: rpcError } = await supabase.rpc('create_post_comments_table', {
+        post_id_param: postId
       });
 
-      if (sqlError) {
-        console.error('SQL Error:', sqlError);
+      if (rpcError) {
+        console.error('RPC Error:', rpcError);
         toast({
           title: "Erreur",
           description: "Impossible de créer la table",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Type assertion pour la réponse
+      const result = data as { success: boolean; error?: string; table_name?: string };
+
+      if (!result.success) {
+        console.error('Function Error:', result.error);
+        toast({
+          title: "Erreur",
+          description: `Erreur lors de la création: ${result.error}`,
           variant: "destructive",
         });
         return;
@@ -134,7 +122,7 @@ export default function PostsList() {
 
       toast({
         title: "Table créée",
-        description: `Table ${tableName} créée avec succès`,
+        description: `Table ${result.table_name} créée avec succès`,
       });
     } catch (error) {
       console.error('Erreur:', error);
