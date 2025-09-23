@@ -19,6 +19,7 @@ type Post = {
 export default function PostsList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedPostId, setExpandedPostId] = useState<number | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -102,11 +103,7 @@ export default function PostsList() {
   };
 
   const handleViewDetails = (postId: number) => {
-    console.log(`Affichage des détails du post ${postId}`);
-    toast({
-      title: "Détails du post",
-      description: "La page de détails sera bientôt disponible",
-    });
+    setExpandedPostId(expandedPostId === postId ? null : postId);
   };
 
 
@@ -139,64 +136,106 @@ export default function PostsList() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <Card key={post.id} className="group hover:shadow-lg transition-all duration-300 hover-scale">
-              <CardHeader className="pb-4">
-                <div className="space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-lg font-semibold line-clamp-3 group-hover:text-primary transition-colors">
-                      Post id {post.id}
-                    </CardTitle>
-                    <Badge variant="outline" className="shrink-0 text-xs">
-                      #{post.Post_id || post.id}
-                    </Badge>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {posts.map((post) => {
+            const isExpanded = expandedPostId === post.id;
+            return (
+              <Card key={post.id} className="group hover:shadow-lg transition-all duration-300 hover-scale">
+                <CardHeader className="pb-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors">
+                        Post id {post.id}
+                      </CardTitle>
+                      <Badge variant="outline" className="shrink-0 text-xs">
+                        #{post.Post_id || post.id}
+                      </Badge>
+                    </div>
+                    
+                    <CardDescription className="flex items-center gap-2 text-sm">
+                      <span className="text-muted-foreground">
+                        {new Date(post.created_at).toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </span>
+                    </CardDescription>
+
+                    {isExpanded && (
+                      <div className="space-y-3 pt-3 border-t animate-fade-in">
+                        {post.Caption && (
+                          <div>
+                            <h4 className="font-medium text-sm text-muted-foreground mb-1">Caption:</h4>
+                            <p className="text-sm leading-relaxed">{post.Caption}</p>
+                          </div>
+                        )}
+                        
+                        {post.keyword && (
+                          <div>
+                            <h4 className="font-medium text-sm text-muted-foreground mb-1">Mots-clés:</h4>
+                            <p className="text-sm">{post.keyword}</p>
+                          </div>
+                        )}
+                        
+                        {post.post_url && (
+                          <div>
+                            <h4 className="font-medium text-sm text-muted-foreground mb-1">URL du post:</h4>
+                            <a 
+                              href={post.post_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="text-sm text-primary hover:underline break-all"
+                            >
+                              {post.post_url}
+                            </a>
+                          </div>
+                        )}
+                        
+                        <div>
+                          <h4 className="font-medium text-sm text-muted-foreground mb-1">Statut de la table:</h4>
+                          <p className="text-sm">
+                            {post.table_exist ? "Table créée" : "Aucune table"}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
-                  <CardDescription className="flex items-center gap-2 text-sm">
-                    <span className="text-muted-foreground">
-                      {new Date(post.created_at).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric'
-                      })}
-                    </span>
-                  </CardDescription>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="pt-0">
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => handleViewDetails(post.id)}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Détail
-                  </Button>
-                  
-                  {post.table_exist ? (
-                    <Badge variant="secondary" className="flex-1 justify-center py-2">
-                      <Database className="h-4 w-4 mr-2" />
-                      Table créée
-                    </Badge>
-                  ) : (
+                </CardHeader>
+                
+                <CardContent className="pt-0">
+                  <div className="flex gap-2">
                     <Button 
-                      variant="default" 
+                      variant="outline" 
                       size="sm"
-                      className="flex-1 bg-blue-500/70 hover:bg-blue-500/90 text-white border-0"
-                      onClick={() => handleCreateTable(post.id)}
+                      className="flex-1"
+                      onClick={() => handleViewDetails(post.id)}
                     >
-                      <Database className="h-4 w-4 mr-2" />
-                      Créer table
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      {isExpanded ? "Masquer" : "Détail"}
                     </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                    
+                    {post.table_exist ? (
+                      <Badge variant="secondary" className="flex-1 justify-center py-2">
+                        <Database className="h-4 w-4 mr-2" />
+                        Table créée
+                      </Badge>
+                    ) : (
+                      <Button 
+                        variant="default" 
+                        size="sm"
+                        className="flex-1 bg-blue-500/70 hover:bg-blue-500/90 text-white border-0"
+                        onClick={() => handleCreateTable(post.id)}
+                      >
+                        <Database className="h-4 w-4 mr-2" />
+                        Créer table
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>
