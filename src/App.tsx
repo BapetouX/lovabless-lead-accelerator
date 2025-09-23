@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import LeadMagnet from "./pages/LeadMagnet";
 import Content from "./pages/Content";
+import PostsList from "./pages/PostsList";
 import Competitors from "./pages/Competitors";
 import NotFound from "./pages/NotFound";
 
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="lead-magnet" element={<LeadMagnet />} />
             <Route path="content" element={<Content />} />
+            <Route path="posts" element={<PostsList />} />
             <Route path="competitors" element={<Competitors />} />
           </Route>
           <Route path="*" element={<NotFound />} />
