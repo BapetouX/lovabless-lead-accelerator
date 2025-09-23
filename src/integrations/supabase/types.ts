@@ -52,19 +52,25 @@ export type Database = {
           Caption: string | null
           created_at: string
           id: number
+          keyword: string | null
           Post_id: number | null
+          post_url: string | null
         }
         Insert: {
           Caption?: string | null
           created_at: string
           id?: number
+          keyword?: string | null
           Post_id?: number | null
+          post_url?: string | null
         }
         Update: {
           Caption?: string | null
           created_at?: string
           id?: number
+          keyword?: string | null
           Post_id?: number | null
+          post_url?: string | null
         }
         Relationships: []
       }
