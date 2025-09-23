@@ -1,94 +1,125 @@
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Database, BarChart3 } from "lucide-react";
+import { ExternalLink, Database, BarChart3, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-const mockPosts = [
-  {
-    id: "123456",
-    title: "Comment générer 10 leads par jour sur LinkedIn",
-    url: "https://linkedin.com/posts/exemple-123456",
-    date: "2024-01-15",
-    commentsCount: 42,
-    hasTable: true,
-    tableName: "post_123456_comments"
-  },
-  {
-    id: "789012",
-    title: "5 stratégies pour doubler votre taux d'engagement",
-    url: "https://linkedin.com/posts/exemple-789012",
-    date: "2024-01-12",
-    commentsCount: 28,
-    hasTable: false,
-    tableName: null
-  },
-  {
-    id: "345678",
-    title: "Le secret d'un profil LinkedIn qui convertit",
-    url: "https://linkedin.com/posts/exemple-345678",
-    date: "2024-01-10",
-    commentsCount: 65,
-    hasTable: true,
-    tableName: "post_345678_comments"
-  }
-];
+interface Post {
+  id: number;
+  Post_id: number | null;
+  Caption: string | null;
+  created_at: string;
+}
 
 export default function PostsList() {
-  const handleCreateTable = (postId: string) => {
-    console.log(`Création de table pour le post ${postId}`);
-    // TODO: Implémenter la création de table Supabase
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('Posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Erreur lors de la récupération des posts:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les posts",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setPosts(data || []);
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleViewData = (tableName: string) => {
-    console.log(`Affichage des données de la table ${tableName}`);
-    // TODO: Implémenter la vue des données
+  const handleCreateTable = (postId: number) => {
+    console.log(`Création de table pour le post ${postId}`);
+    toast({
+      title: "Fonctionnalité à venir",
+      description: "La création de table sera bientôt disponible",
+    });
   };
+
+  const handleViewData = (postId: number) => {
+    console.log(`Affichage des données du post ${postId}`);
+    toast({
+      title: "Fonctionnalité à venir", 
+      description: "La visualisation des données sera bientôt disponible",
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Chargement des posts...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Liste des posts</h1>
         <p className="text-muted-foreground mt-2">
-          Gérez vos posts LinkedIn et leurs données associées
+          Gérez vos posts LinkedIn et leurs données associées ({posts.length} posts)
         </p>
       </div>
 
-      <div className="grid gap-4">
-        {mockPosts.map((post) => (
-          <Card key={post.id} className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <CardTitle className="text-lg line-clamp-2">{post.title}</CardTitle>
-                  <CardDescription>
-                    Publié le {new Date(post.date).toLocaleDateString('fr-FR')} • {post.commentsCount} commentaires
-                  </CardDescription>
+      {posts.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Database className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">Aucun post trouvé</h3>
+            <p className="text-muted-foreground text-center">
+              Aucun post n'a été trouvé dans la base de données.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4">
+          {posts.map((post) => (
+            <Card key={post.id} className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <CardTitle className="text-lg line-clamp-2">
+                      {post.Caption || `Post #${post.Post_id || post.id}`}
+                    </CardTitle>
+                    <CardDescription>
+                      Créé le {new Date(post.created_at).toLocaleDateString('fr-FR')}
+                      {post.Post_id && ` • ID LinkedIn: ${post.Post_id}`}
+                    </CardDescription>
+                  </div>
+                  <Badge variant="secondary">
+                    Pas de table
+                  </Badge>
                 </div>
-                <Badge variant={post.hasTable ? "default" : "secondary"}>
-                  {post.hasTable ? "Table créée" : "Pas de table"}
-                </Badge>
-              </div>
-            </CardHeader>
-            
-            <CardContent>
-              <div className="flex items-center gap-3">
-                <Button variant="outline" size="sm" asChild>
-                  <a href={post.url} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Voir le post
-                  </a>
-                </Button>
-                
-                {post.hasTable ? (
-                  <Button 
-                    variant="default" 
-                    size="sm"
-                    onClick={() => handleViewData(post.tableName!)}
-                  >
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    Voir les données
-                  </Button>
-                ) : (
+              </CardHeader>
+              
+              <CardContent>
+                <div className="flex items-center gap-3">
                   <Button 
                     variant="secondary" 
                     size="sm"
@@ -97,12 +128,21 @@ export default function PostsList() {
                     <Database className="h-4 w-4 mr-2" />
                     Créer table
                   </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleViewData(post.id)}
+                  >
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Voir les données
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
