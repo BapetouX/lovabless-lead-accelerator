@@ -69,23 +69,20 @@ export default function PostsList() {
 
   const handleCreateTable = async (postId: number) => {
     try {
-      console.log('Calling edge function for post:', postId);
-      
-      const { data, error } = await supabase.functions.invoke('create-post-comments-table', {
-        body: { post_id: postId }
-      });
+      const { error } = await supabase
+        .from('Posts')
+        .update({ table_exist: true })
+        .eq('id', postId);
 
       if (error) {
-        console.error('Edge function error:', error);
+        console.error('Update error:', error);
         toast({
           title: "Erreur",
-          description: `Erreur de l'edge function: ${error.message}`,
+          description: "Impossible de marquer la table comme créée",
           variant: "destructive",
         });
         return;
       }
-
-      console.log('Edge function response:', data);
 
       // Mettre à jour l'état local
       setPosts(posts.map(post => 
@@ -95,14 +92,14 @@ export default function PostsList() {
       ));
 
       toast({
-        title: "Table créée",
-        description: `Table ${data.tableName} créée avec succès`,
+        title: "Table activée",
+        description: "Le post est maintenant prêt pour recevoir des commentaires",
       });
     } catch (error) {
       console.error('Erreur:', error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la création de la table",
+        description: "Une erreur est survenue",
         variant: "destructive",
       });
     }
