@@ -1,1 +1,4 @@
 project_id = "acfwdjrjtidghrfyzwgz"
+
+[functions.create-post-comments-table]
+verify_jwt = false
