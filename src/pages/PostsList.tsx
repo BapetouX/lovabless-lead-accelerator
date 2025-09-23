@@ -101,6 +101,14 @@ export default function PostsList() {
     }
   };
 
+  const handleViewDetails = (postId: number) => {
+    console.log(`Affichage des détails du post ${postId}`);
+    toast({
+      title: "Détails du post",
+      description: "La page de détails sera bientôt disponible",
+    });
+  };
+
 
   if (loading) {
     return (
@@ -138,8 +146,7 @@ export default function PostsList() {
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-lg font-semibold line-clamp-3 group-hover:text-primary transition-colors">
-                      {post.Caption?.slice(0, 100) || `Post LinkedIn`}
-                      {post.Caption && post.Caption.length > 100 && "..."}
+                      Post id {post.id}
                     </CardTitle>
                     <Badge variant="outline" className="shrink-0 text-xs">
                       #{post.Post_id || post.id}
@@ -159,22 +166,34 @@ export default function PostsList() {
               </CardHeader>
               
               <CardContent className="pt-0">
-                {post.table_exist ? (
-                  <Badge variant="secondary" className="w-full justify-center py-2">
-                    <Database className="h-4 w-4 mr-2" />
-                    Table créée
-                  </Badge>
-                ) : (
+                <div className="flex gap-2">
                   <Button 
-                    variant="default" 
+                    variant="outline" 
                     size="sm"
-                    className="w-full bg-blue-500/70 hover:bg-blue-500/90 text-white border-0 animate-fade-in"
-                    onClick={() => handleCreateTable(post.id)}
+                    className="flex-1"
+                    onClick={() => handleViewDetails(post.id)}
                   >
-                    <Database className="h-4 w-4 mr-2" />
-                    Créer une table
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Détail
                   </Button>
-                )}
+                  
+                  {post.table_exist ? (
+                    <Badge variant="secondary" className="flex-1 justify-center py-2">
+                      <Database className="h-4 w-4 mr-2" />
+                      Table créée
+                    </Badge>
+                  ) : (
+                    <Button 
+                      variant="default" 
+                      size="sm"
+                      className="flex-1 bg-blue-500/70 hover:bg-blue-500/90 text-white border-0"
+                      onClick={() => handleCreateTable(post.id)}
+                    >
+                      <Database className="h-4 w-4 mr-2" />
+                      Créer table
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
