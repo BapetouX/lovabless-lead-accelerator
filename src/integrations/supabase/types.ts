@@ -17,7 +17,7 @@ export type Database = {
       "Leads Linkedin": {
         Row: {
           connection_status: string | null
-          date: string
+          date: string | null
           dm_status: string | null
           entreprise: string | null
           headline: string | null
@@ -27,7 +27,7 @@ export type Database = {
         }
         Insert: {
           connection_status?: string | null
-          date: string
+          date?: string | null
           dm_status?: string | null
           entreprise?: string | null
           headline?: string | null
@@ -37,7 +37,7 @@ export type Database = {
         }
         Update: {
           connection_status?: string | null
-          date?: string
+          date?: string | null
           dm_status?: string | null
           entreprise?: string | null
           headline?: string | null
