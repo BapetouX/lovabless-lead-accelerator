@@ -51,7 +51,8 @@ export type Database = {
         Row: {
           comment_date: string | null
           created_at: string
-          id: number
+          id_comment_primary: string
+          linkedin_id: string
           linkedin_title: string | null
           linkedin_url: string | null
           person_name: string | null
@@ -61,7 +62,8 @@ export type Database = {
         Insert: {
           comment_date?: string | null
           created_at?: string
-          id?: number
+          id_comment_primary?: string
+          linkedin_id: string
           linkedin_title?: string | null
           linkedin_url?: string | null
           person_name?: string | null
@@ -71,7 +73,8 @@ export type Database = {
         Update: {
           comment_date?: string | null
           created_at?: string
-          id?: number
+          id_comment_primary?: string
+          linkedin_id?: string
           linkedin_title?: string | null
           linkedin_url?: string | null
           person_name?: string | null
