@@ -5,11 +5,13 @@ import {
   Users, 
   Magnet,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Home
 } from "lucide-react";
 import { useState } from "react";
 
 const navigation = [
+  { name: "Accueil", href: "/home", icon: Home },
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Création de contenu", href: "/content", icon: PenTool },
   { name: "Liste des posts", href: "/posts", icon: PenTool },
