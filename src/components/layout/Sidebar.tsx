@@ -11,7 +11,8 @@ import {
   ChevronRight as ChevronRightSmall,
   Eye,
   List,
-  FileText
+  FileText,
+  TrendingUp
 } from "lucide-react";
 import { useState } from "react";
 
@@ -26,10 +27,17 @@ const navigation = [
     icon: PenTool,
     isSection: true,
     children: [
-      { name: "Veille de contenu", href: "/content-watch", icon: Eye },
-      { name: "Liste de concurrent", href: "/competitors", icon: Users },
       { name: "Création de posts", href: "/content", icon: FileText },
       { name: "Liste des posts", href: "/posts", icon: List },
+    ]
+  },
+  {
+    name: "Veille de contenu",
+    icon: Eye,
+    isSection: true,
+    children: [
+      { name: "Posts concurrents", href: "/content-watch", icon: TrendingUp },
+      { name: "Liste concurrents", href: "/competitors", icon: Users },
     ]
   },
   {
@@ -45,7 +53,7 @@ const navigation = [
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<string[]>(['Création de contenu', 'Leads']);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['Création de contenu', 'Veille de contenu', 'Leads']);
 
   const toggleSection = (sectionName: string) => {
     setExpandedSections(prev => 
