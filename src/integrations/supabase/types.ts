@@ -50,35 +50,35 @@ export type Database = {
       post_comments_1: {
         Row: {
           comment_date: string | null
+          connection_request_statut: boolean | null
           created_at: string
           id_comment_primary: string
           linkedin_id: string
           linkedin_title: string | null
           linkedin_url: string | null
           person_name: string | null
-          post_id: number
           received_dm: boolean | null
         }
         Insert: {
           comment_date?: string | null
+          connection_request_statut?: boolean | null
           created_at?: string
           id_comment_primary?: string
           linkedin_id: string
           linkedin_title?: string | null
           linkedin_url?: string | null
           person_name?: string | null
-          post_id?: number
           received_dm?: boolean | null
         }
         Update: {
           comment_date?: string | null
+          connection_request_statut?: boolean | null
           created_at?: string
           id_comment_primary?: string
           linkedin_id?: string
           linkedin_title?: string | null
           linkedin_url?: string | null
           person_name?: string | null
-          post_id?: number
           received_dm?: boolean | null
         }
         Relationships: []
@@ -94,6 +94,7 @@ export type Database = {
           Post_id: number | null
           post_url: string | null
           table_exist: boolean | null
+          Url_lead_magnet: string | null
           urn_post_id: string | null
         }
         Insert: {
@@ -106,6 +107,7 @@ export type Database = {
           Post_id?: number | null
           post_url?: string | null
           table_exist?: boolean | null
+          Url_lead_magnet?: string | null
           urn_post_id?: string | null
         }
         Update: {
@@ -118,6 +120,7 @@ export type Database = {
           Post_id?: number | null
           post_url?: string | null
           table_exist?: boolean | null
+          Url_lead_magnet?: string | null
           urn_post_id?: string | null
         }
         Relationships: []
@@ -127,6 +130,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_comments_by_status: {
+        Args: { table_name: string }
+        Returns: Json
+      }
       create_post_comments_table: {
         Args: { post_id_param: number }
         Returns: Json
