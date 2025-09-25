@@ -178,7 +178,7 @@ export default function LeadMagnet() {
               </div>
             </div>
             <Button 
-              onClick={() => navigate('/competitors')} 
+              onClick={() => navigate('/leads')} 
               className="w-full mt-4"
               variant="outline"
             >

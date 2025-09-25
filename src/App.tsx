@@ -11,6 +11,7 @@ import LeadMagnet from "./pages/LeadMagnet";
 import Content from "./pages/Content";
 import PostsList from "./pages/PostsList";
 import Competitors from "./pages/Competitors";
+import Leads from "./pages/Leads";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="content" element={<Content />} />
             <Route path="posts" element={<PostsList />} />
             <Route path="competitors" element={<Competitors />} />
+            <Route path="leads" element={<Leads />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
