@@ -131,7 +131,7 @@ export type Database = {
     }
     Functions: {
       count_comments_by_status: {
-        Args: { table_name: string }
+        Args: { p_table_name: string }
         Returns: Json
       }
       create_post_comments_table: {

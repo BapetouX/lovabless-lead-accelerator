@@ -17,8 +17,10 @@ type Post = {
 
 type CommentsCount = {
   total: number;
-  treated: number;
-  untreated: number;
+  received_dm: number;
+  connection_request: number;
+  not_received_dm: number;
+  not_connection_request: number;
 };
 
 export default function LeadMagnet() {
@@ -62,12 +64,19 @@ export default function LeadMagnet() {
   const fetchCommentsCount = async (postId: number, tableName: string) => {
     try {
       const { data, error } = await supabase.rpc('count_comments_by_status', {
-        table_name: tableName
+        p_table_name: tableName
       });
 
       if (error) throw error;
 
-      const result = data as { total: number; treated: number; untreated: number; error?: string };
+      const result = data as { 
+        total: number; 
+        received_dm: number; 
+        connection_request: number; 
+        not_received_dm: number; 
+        not_connection_request: number; 
+        error?: string 
+      };
       
       if (result.error) {
         console.error(`Error in RPC for ${tableName}:`, result.error);
@@ -78,8 +87,10 @@ export default function LeadMagnet() {
         ...prev,
         [postId]: {
           total: result.total || 0,
-          treated: result.treated || 0,
-          untreated: result.untreated || 0
+          received_dm: result.received_dm || 0,
+          connection_request: result.connection_request || 0,
+          not_received_dm: result.not_received_dm || 0,
+          not_connection_request: result.not_connection_request || 0
         }
       }));
     } catch (error) {
@@ -101,8 +112,8 @@ export default function LeadMagnet() {
   };
 
   const totalComments = Object.values(commentsData).reduce((sum, data) => sum + data.total, 0);
-  const totalTreated = Object.values(commentsData).reduce((sum, data) => sum + data.treated, 0);
-  const totalUntreated = Object.values(commentsData).reduce((sum, data) => sum + data.untreated, 0);
+  const totalReceivedDM = Object.values(commentsData).reduce((sum, data) => sum + data.received_dm, 0);
+  const totalConnectionRequests = Object.values(commentsData).reduce((sum, data) => sum + data.connection_request, 0);
 
   if (loading) {
     return (
@@ -209,7 +220,13 @@ export default function LeadMagnet() {
               </div>
             ) : (
               posts.map((post) => {
-                const comments = commentsData[post.id] || { total: 0, treated: 0, untreated: 0 };
+                const comments = commentsData[post.id] || { 
+                  total: 0, 
+                  received_dm: 0, 
+                  connection_request: 0, 
+                  not_received_dm: 0, 
+                  not_connection_request: 0 
+                };
                 return (
                   <div
                     key={post.id}
@@ -237,18 +254,22 @@ export default function LeadMagnet() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-4">
                       <div className="text-center">
                         <p className="text-sm text-muted-foreground">Total</p>
                         <p className="text-lg font-semibold text-foreground">{comments.total}</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Traités</p>
-                        <p className="text-lg font-semibold text-green-600">{comments.treated}</p>
+                        <p className="text-sm text-muted-foreground">DM envoyés</p>
+                        <p className="text-lg font-semibold text-green-600">{comments.received_dm}</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Non traités</p>
-                        <p className="text-lg font-semibold text-orange-600">{comments.untreated}</p>
+                        <p className="text-sm text-muted-foreground">Connexions</p>
+                        <p className="text-lg font-semibold text-blue-600">{comments.connection_request}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-muted-foreground">Sans DM</p>
+                        <p className="text-lg font-semibold text-orange-600">{comments.not_received_dm}</p>
                       </div>
                     </div>
                   </div>
@@ -263,18 +284,22 @@ export default function LeadMagnet() {
       {posts.length > 0 && (
         <Card className="shadow-card bg-gradient-to-r from-primary/5 to-secondary/5">
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
               <div>
                 <p className="text-2xl font-bold text-foreground">{totalComments}</p>
                 <p className="text-sm text-muted-foreground">Total commentaires</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-green-600">{totalTreated}</p>
-                <p className="text-sm text-muted-foreground">Commentaires traités</p>
+                <p className="text-2xl font-bold text-green-600">{totalReceivedDM}</p>
+                <p className="text-sm text-muted-foreground">DM envoyés</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-orange-600">{totalUntreated}</p>
-                <p className="text-sm text-muted-foreground">Commentaires non traités</p>
+                <p className="text-2xl font-bold text-blue-600">{totalConnectionRequests}</p>
+                <p className="text-sm text-muted-foreground">Demandes de connexion</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-orange-600">{totalComments - totalReceivedDM}</p>
+                <p className="text-sm text-muted-foreground">Sans DM</p>
               </div>
             </div>
           </CardContent>
