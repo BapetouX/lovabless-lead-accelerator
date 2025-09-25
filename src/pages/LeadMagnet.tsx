@@ -61,17 +61,25 @@ export default function LeadMagnet() {
 
   const fetchCommentsCount = async (postId: number, tableName: string) => {
     try {
-      // Pour l'instant, on simule les données car on ne peut pas requêter des tables dynamiques directement
-      // En production, il faudrait créer des fonctions RPC pour compter les commentaires
-      const mockTotal = Math.floor(Math.random() * 50) + 10;
-      const mockTreated = Math.floor(mockTotal * Math.random());
+      const { data, error } = await supabase.rpc('count_comments_by_status', {
+        table_name: tableName
+      });
+
+      if (error) throw error;
+
+      const result = data as { total: number; treated: number; untreated: number; error?: string };
       
+      if (result.error) {
+        console.error(`Error in RPC for ${tableName}:`, result.error);
+        return;
+      }
+
       setCommentsData(prev => ({
         ...prev,
         [postId]: {
-          total: mockTotal,
-          treated: mockTreated,
-          untreated: mockTotal - mockTreated
+          total: result.total || 0,
+          treated: result.treated || 0,
+          untreated: result.untreated || 0
         }
       }));
     } catch (error) {
@@ -123,7 +131,7 @@ export default function LeadMagnet() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Posts avec table</p>
+                <p className="text-sm text-muted-foreground">Posts actifs</p>
                 <p className="text-2xl font-bold text-foreground">{posts.length}</p>
               </div>
               <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -158,6 +166,13 @@ export default function LeadMagnet() {
                 <Users className="h-6 w-6 text-primary" />
               </div>
             </div>
+            <Button 
+              onClick={() => navigate('/competitors')} 
+              className="w-full mt-4"
+              variant="outline"
+            >
+              Voir tous les leads
+            </Button>
           </CardContent>
         </Card>
 
@@ -202,7 +217,7 @@ export default function LeadMagnet() {
                   >
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-foreground truncate pr-4">
-                        {post.Caption || 'Post sans titre'}
+                        Post {post.id} : {post.Caption ? post.Caption.split(' ').slice(0, 3).join(' ') : 'Sans titre'}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="secondary" className="text-xs">
