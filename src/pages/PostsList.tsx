@@ -144,7 +144,7 @@ export default function PostsList() {
     try {
       const { error } = await supabase
         .from('Posts')
-        .update({ Url_lead_magnet: url })
+        .update({ url_lead_magnet: url })
         .eq('id', postId);
 
       if (error) {
