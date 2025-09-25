@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ExternalLink, Database, BarChart3, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ExternalLink, Database, BarChart3, Loader2, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,11 +18,13 @@ type Post = {
   post_url?: string | null;
   media?: string | null;
   urn_post_id?: string | null;
+  Url_lead_magnet?: string | null;
 }
 
 export default function PostsList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [leadMagnetUrls, setLeadMagnetUrls] = useState<{[key: number]: string}>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -137,7 +140,49 @@ export default function PostsList() {
     }
   };
 
+  const handleUpdateLeadMagnet = async (postId: number, url: string) => {
+    try {
+      const { error } = await supabase
+        .from('Posts')
+        .update({ Url_lead_magnet: url })
+        .eq('id', postId);
 
+      if (error) {
+        console.error('Erreur lors de la mise à jour:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de mettre à jour l'URL du lead magnet",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Mettre à jour l'état local
+      setPosts(posts.map(post => 
+        post.id === postId 
+          ? { ...post, Url_lead_magnet: url }
+          : post
+      ));
+
+      // Vider le champ input
+      setLeadMagnetUrls(prev => ({
+        ...prev,
+        [postId]: ''
+      }));
+
+      toast({
+        title: "Succès",
+        description: "URL du lead magnet mise à jour",
+      });
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -195,150 +240,195 @@ export default function PostsList() {
               </CardHeader>
               
               <CardContent className="pt-0">
-                <div className="flex gap-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
+                <div className="space-y-3">
+                  {/* Section Lead Magnet */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-muted-foreground">Lead Magnet URL:</h4>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Coller l'URL du lead magnet..."
+                        value={leadMagnetUrls[post.id] || ''}
+                        onChange={(e) => setLeadMagnetUrls(prev => ({
+                          ...prev,
+                          [post.id]: e.target.value
+                        }))}
                         className="flex-1"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => handleUpdateLeadMagnet(post.id, leadMagnetUrls[post.id] || '')}
+                        disabled={!leadMagnetUrls[post.id]?.trim()}
                       >
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        Détail
+                        <Save className="h-4 w-4 mr-1" />
+                        OK
                       </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Détails du Post {post.id}</DialogTitle>
-                      </DialogHeader>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="font-medium text-sm text-muted-foreground mb-1">Date de création:</h4>
-                          <p className="text-sm">
-                            {new Date(post.created_at).toLocaleDateString('fr-FR', {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </p>
-                        </div>
-
-                        {post.Caption && (
+                    </div>
+                    {post.Url_lead_magnet && (
+                      <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+                        Actuel: <a href={post.Url_lead_magnet} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">{post.Url_lead_magnet}</a>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="flex-1"
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Détail
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Détails du Post {post.id}</DialogTitle>
+                        </DialogHeader>
+                        
+                        <div className="space-y-4">
                           <div>
-                            <h4 className="font-medium text-sm text-muted-foreground mb-1">Caption:</h4>
-                            <p className="text-sm leading-relaxed bg-muted/50 p-3 rounded-md">{post.Caption}</p>
+                            <h4 className="font-medium text-sm text-muted-foreground mb-1">Date de création:</h4>
+                            <p className="text-sm">
+                              {new Date(post.created_at).toLocaleDateString('fr-FR', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </p>
                           </div>
-                        )}
 
-                        {post.media && (
-                          <div>
-                            <h4 className="font-medium text-sm text-muted-foreground mb-1">Media:</h4>
-                            {post.media.toLowerCase().includes('.pdf') ? (
-                              <div className="bg-muted/50 p-3 rounded-md">
-                                <p className="text-sm mb-2">Document PDF:</p>
-                                <a 
-                                  href={post.media} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="text-sm text-primary hover:underline break-all"
-                                >
-                                  {post.media}
-                                </a>
-                              </div>
-                            ) : (
-                              <div className="bg-muted/50 p-3 rounded-md">
-                                <p className="text-sm mb-2">Image:</p>
-                                <img 
-                                  src={post.media} 
-                                  alt="Media du post" 
-                                  className="max-w-full h-auto rounded-md border"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.style.display = 'none';
-                                    const nextEl = target.nextElementSibling as HTMLElement;
-                                    if (nextEl) nextEl.style.display = 'block';
-                                  }}
-                                />
-                                <p className="text-sm text-muted-foreground hidden">
-                                  Impossible de charger l'image: 
+                          {post.Caption && (
+                            <div>
+                              <h4 className="font-medium text-sm text-muted-foreground mb-1">Caption:</h4>
+                              <p className="text-sm leading-relaxed bg-muted/50 p-3 rounded-md">{post.Caption}</p>
+                            </div>
+                          )}
+
+                          {post.media && (
+                            <div>
+                              <h4 className="font-medium text-sm text-muted-foreground mb-1">Media:</h4>
+                              {post.media.toLowerCase().includes('.pdf') ? (
+                                <div className="bg-muted/50 p-3 rounded-md">
+                                  <p className="text-sm mb-2">Document PDF:</p>
                                   <a 
                                     href={post.media} 
                                     target="_blank" 
                                     rel="noopener noreferrer" 
-                                    className="text-primary hover:underline break-all ml-1"
+                                    className="text-sm text-primary hover:underline break-all"
                                   >
                                     {post.media}
                                   </a>
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        
-                        {post.keyword && (
-                          <div>
-                            <h4 className="font-medium text-sm text-muted-foreground mb-1">Mots-clés:</h4>
-                            <p className="text-sm bg-muted/50 p-3 rounded-md">{post.keyword}</p>
-                          </div>
-                        )}
-                        
-                        {post.post_url && (
-                          <div>
-                            <h4 className="font-medium text-sm text-muted-foreground mb-1">URL du post:</h4>
-                            <a 
-                              href={post.post_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                              className="text-sm text-primary hover:underline break-all bg-muted/50 p-3 rounded-md block"
-                            >
-                              {post.post_url}
-                            </a>
-                          </div>
-                        )}
+                                </div>
+                              ) : (
+                                <div className="bg-muted/50 p-3 rounded-md">
+                                  <p className="text-sm mb-2">Image:</p>
+                                  <img 
+                                    src={post.media} 
+                                    alt="Media du post" 
+                                    className="max-w-full h-auto rounded-md border"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'none';
+                                      const nextEl = target.nextElementSibling as HTMLElement;
+                                      if (nextEl) nextEl.style.display = 'block';
+                                    }}
+                                  />
+                                  <p className="text-sm text-muted-foreground hidden">
+                                    Impossible de charger l'image: 
+                                    <a 
+                                      href={post.media} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="text-primary hover:underline break-all ml-1"
+                                    >
+                                      {post.media}
+                                    </a>
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          {post.keyword && (
+                            <div>
+                              <h4 className="font-medium text-sm text-muted-foreground mb-1">Mots-clés:</h4>
+                              <p className="text-sm bg-muted/50 p-3 rounded-md">{post.keyword}</p>
+                            </div>
+                          )}
+                          
+                          {post.post_url && (
+                            <div>
+                              <h4 className="font-medium text-sm text-muted-foreground mb-1">URL du post:</h4>
+                              <a 
+                                href={post.post_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="text-sm text-primary hover:underline break-all bg-muted/50 p-3 rounded-md block"
+                              >
+                                {post.post_url}
+                              </a>
+                            </div>
+                          )}
 
-                        {post.urn_post_id && (
+                          {post.urn_post_id && (
+                            <div>
+                              <h4 className="font-medium text-sm text-muted-foreground mb-1">URN Post ID:</h4>
+                              <p className="text-sm bg-muted/50 p-3 rounded-md font-mono">{post.urn_post_id}</p>
+                            </div>
+                          )}
+                          
+                          {post.Url_lead_magnet && (
+                            <div>
+                              <h4 className="font-medium text-sm text-muted-foreground mb-1">URL Lead Magnet:</h4>
+                              <a 
+                                href={post.Url_lead_magnet} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="text-sm text-primary hover:underline break-all bg-muted/50 p-3 rounded-md block"
+                              >
+                                {post.Url_lead_magnet}
+                              </a>
+                            </div>
+                          )}
+                          
                           <div>
-                            <h4 className="font-medium text-sm text-muted-foreground mb-1">URN Post ID:</h4>
-                            <p className="text-sm bg-muted/50 p-3 rounded-md font-mono">{post.urn_post_id}</p>
+                            <h4 className="font-medium text-sm text-muted-foreground mb-1">Statut de la table:</h4>
+                            <p className="text-sm">
+                              {post.table_exist ? (
+                                <Badge variant="secondary">
+                                  <Database className="h-4 w-4 mr-2" />
+                                  Table créée
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline">Aucune table</Badge>
+                              )}
+                            </p>
                           </div>
-                        )}
-                        
-                        <div>
-                          <h4 className="font-medium text-sm text-muted-foreground mb-1">Statut de la table:</h4>
-                          <p className="text-sm">
-                            {post.table_exist ? (
-                              <Badge variant="secondary">
-                                <Database className="h-4 w-4 mr-2" />
-                                Table créée
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline">Aucune table</Badge>
-                            )}
-                          </p>
                         </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                  
-                  {post.table_exist ? (
-                    <Badge variant="secondary" className="flex-1 justify-center py-2">
-                      <Database className="h-4 w-4 mr-2" />
-                      Table créée
-                    </Badge>
-                  ) : (
-                    <Button 
-                      variant="default" 
-                      size="sm"
-                      className="flex-1 bg-blue-500/70 hover:bg-blue-500/90 text-white border-0"
-                      onClick={() => handleCreateTable(post.id)}
-                    >
-                      <Database className="h-4 w-4 mr-2" />
-                      Créer table
-                    </Button>
-                  )}
+                      </DialogContent>
+                    </Dialog>
+                    
+                    {post.table_exist ? (
+                      <Badge variant="secondary" className="flex-1 justify-center py-2">
+                        <Database className="h-4 w-4 mr-2" />
+                        Table créée
+                      </Badge>
+                    ) : (
+                      <Button 
+                        variant="default" 
+                        size="sm"
+                        className="flex-1 bg-blue-500/70 hover:bg-blue-500/90 text-white border-0"
+                        onClick={() => handleCreateTable(post.id)}
+                      >
+                        <Database className="h-4 w-4 mr-2" />
+                        Créer table
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
