@@ -14,6 +14,137 @@ export type Database = {
   }
   public: {
     Tables: {
+      competitor_posts: {
+        Row: {
+          caption: string | null
+          comments_count: number | null
+          competitor_id: number
+          content_type: string | null
+          created_at: string
+          engagement_rate: number | null
+          hashtags: string[] | null
+          id: number
+          is_analyzed: boolean | null
+          keywords: string[] | null
+          likes_count: number | null
+          media_urls: string[] | null
+          performance_score: number | null
+          post_date: string | null
+          post_id_linkedin: string | null
+          post_url: string | null
+          sentiment: string | null
+          shares_count: number | null
+          updated_at: string
+          urn_post_id: string | null
+        }
+        Insert: {
+          caption?: string | null
+          comments_count?: number | null
+          competitor_id: number
+          content_type?: string | null
+          created_at?: string
+          engagement_rate?: number | null
+          hashtags?: string[] | null
+          id?: number
+          is_analyzed?: boolean | null
+          keywords?: string[] | null
+          likes_count?: number | null
+          media_urls?: string[] | null
+          performance_score?: number | null
+          post_date?: string | null
+          post_id_linkedin?: string | null
+          post_url?: string | null
+          sentiment?: string | null
+          shares_count?: number | null
+          updated_at?: string
+          urn_post_id?: string | null
+        }
+        Update: {
+          caption?: string | null
+          comments_count?: number | null
+          competitor_id?: number
+          content_type?: string | null
+          created_at?: string
+          engagement_rate?: number | null
+          hashtags?: string[] | null
+          id?: number
+          is_analyzed?: boolean | null
+          keywords?: string[] | null
+          likes_count?: number | null
+          media_urls?: string[] | null
+          performance_score?: number | null
+          post_date?: string | null
+          post_id_linkedin?: string | null
+          post_url?: string | null
+          sentiment?: string | null
+          shares_count?: number | null
+          updated_at?: string
+          urn_post_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competitor_posts_competitor_id_fkey"
+            columns: ["competitor_id"]
+            isOneToOne: false
+            referencedRelation: "competitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competitors: {
+        Row: {
+          connection_level: string | null
+          created_at: string
+          entreprise: string | null
+          follower_count: number | null
+          headline: string | null
+          id: number
+          id_linkedin: string
+          industry: string | null
+          last_activity_date: string | null
+          location: string | null
+          name: string | null
+          notes: string | null
+          status: string | null
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          connection_level?: string | null
+          created_at?: string
+          entreprise?: string | null
+          follower_count?: number | null
+          headline?: string | null
+          id?: number
+          id_linkedin: string
+          industry?: string | null
+          last_activity_date?: string | null
+          location?: string | null
+          name?: string | null
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          connection_level?: string | null
+          created_at?: string
+          entreprise?: string | null
+          follower_count?: number | null
+          headline?: string | null
+          id?: number
+          id_linkedin?: string
+          industry?: string | null
+          last_activity_date?: string | null
+          location?: string | null
+          name?: string | null
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       "Leads Linkedin": {
         Row: {
           connection_status: string | null
