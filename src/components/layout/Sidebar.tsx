@@ -6,7 +6,8 @@ import {
   Magnet,
   ChevronLeft,
   ChevronRight,
-  Home
+  Home,
+  UserCheck
 } from "lucide-react";
 import { useState } from "react";
 
@@ -15,8 +16,9 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Création de contenu", href: "/content", icon: PenTool },
   { name: "Liste des posts", href: "/posts", icon: PenTool },
-  { name: "Concurrents", href: "/competitors", icon: Users },
   { name: "Lead Magnet", href: "/lead-magnet", icon: Magnet },
+  { name: "Leads", href: "/leads", icon: UserCheck },
+  { name: "Concurrents", href: "/competitors", icon: Users },
 ];
 
 export function Sidebar() {
