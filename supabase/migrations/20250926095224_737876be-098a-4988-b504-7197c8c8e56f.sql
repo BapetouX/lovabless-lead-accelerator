@@ -1,0 +1,2 @@
+-- Enable the add-competitor edge function
+-- The function is already created and will be automatically deployed
