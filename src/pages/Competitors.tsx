@@ -75,6 +75,7 @@ export default function Competitors() {
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const [newPost, setNewPost] = useState({
@@ -357,15 +358,45 @@ export default function Competitors() {
                   </div>
                   <Button 
                     className="bg-gradient-primary"
-                    onClick={() => {
-                      if (linkedinUrl) {
-                        window.open(`https://n8n.srv802543.hstgr.cloud/webhook/ajout-concurrent?url=${encodeURIComponent(linkedinUrl)}`, '_blank');
-                        setLinkedinUrl("");
+                    disabled={isSubmitting || !linkedinUrl.trim()}
+                    onClick={async () => {
+                      if (!linkedinUrl.trim()) return;
+                      
+                      setIsSubmitting(true);
+                      try {
+                        const response = await fetch('https://n8n.srv802543.hstgr.cloud/webhook-test/ajout-concurrent', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            url: linkedinUrl.trim()
+                          }),
+                        });
+
+                        if (response.ok) {
+                          toast({
+                            title: "Succès",
+                            description: "Concurrent ajouté avec succès",
+                          });
+                          setLinkedinUrl("");
+                        } else {
+                          throw new Error(`Erreur HTTP: ${response.status}`);
+                        }
+                      } catch (error) {
+                        console.error('Erreur lors de l\'ajout du concurrent:', error);
+                        toast({
+                          title: "Erreur",
+                          description: "Impossible d'ajouter le concurrent. Veuillez réessayer.",
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setIsSubmitting(false);
                       }
                     }}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Ajouter concurrent
+                    {isSubmitting ? "Ajout en cours..." : "Ajouter concurrent"}
                   </Button>
                 </div>
               </div>
