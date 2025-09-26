@@ -32,6 +32,7 @@ interface Competitor {
   public_identifier: string;
   name: string;
   headline: string;
+  a_propos: string;
   entreprise: string;
   url: string;
   follower_count: number;
@@ -41,6 +42,7 @@ interface Competitor {
   last_activity_date: string;
   notes: string;
   status: string;
+  photo_profil: string;
   created_at: string;
   updated_at: string;
 }
@@ -338,26 +340,26 @@ export default function Competitors() {
         </TabsList>
 
         <TabsContent value="competitors" className="space-y-4">
-          <Card>
+          <Card className="w-full">
             <CardHeader>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
                 <div>
                   <CardTitle>Liste des Concurrents</CardTitle>
                   <CardDescription>
                     Gérez vos concurrents et consultez leurs informations
                   </CardDescription>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative">
                     <Input
                       placeholder="URL du profil LinkedIn..."
                       value={linkedinUrl}
                       onChange={(e) => setLinkedinUrl(e.target.value)}
-                      className="w-80"
+                      className="w-full sm:w-80"
                     />
                   </div>
                   <Button 
-                    className="bg-gradient-primary"
+                    className="bg-gradient-primary whitespace-nowrap"
                     disabled={isSubmitting || !linkedinUrl.trim()}
                     onClick={async () => {
                       if (!linkedinUrl.trim()) return;
@@ -415,48 +417,148 @@ export default function Competitors() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nom</TableHead>
-                    <TableHead>Entreprise</TableHead>
-                    <TableHead>Industrie</TableHead>
-                    <TableHead>Followers</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCompetitors.map((competitor) => (
-                    <TableRow key={competitor.id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{competitor.name}</div>
-                          <div className="text-sm text-muted-foreground">{competitor.headline}</div>
+            <CardContent className="overflow-x-auto">
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Photo</TableHead>
+                      <TableHead>Profil</TableHead>
+                      <TableHead>Entreprise</TableHead>
+                      <TableHead>Localisation</TableHead>
+                      <TableHead>Connexions</TableHead>
+                      <TableHead>Followers</TableHead>
+                      <TableHead>Statut</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredCompetitors.map((competitor) => (
+                      <TableRow key={competitor.id}>
+                        <TableCell>
+                          <div className="w-12 h-12 rounded-full overflow-hidden bg-muted flex items-center justify-center">
+                            {competitor.photo_profil ? (
+                              <img 
+                                src={competitor.photo_profil} 
+                                alt={competitor.name || 'Photo de profil'} 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                }}
+                              />
+                            ) : null}
+                            <div className={`text-sm font-medium ${competitor.photo_profil ? 'hidden' : ''}`}>
+                              {competitor.name?.charAt(0)?.toUpperCase() || '?'}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="font-medium">{competitor.name || 'Non renseigné'}</div>
+                            <div className="text-sm text-muted-foreground line-clamp-2">{competitor.headline || 'Titre non renseigné'}</div>
+                            <div className="text-xs text-muted-foreground">{competitor.public_identifier || 'ID non renseigné'}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="font-medium">{competitor.entreprise || 'Non renseigné'}</div>
+                            <div className="text-sm text-muted-foreground">{competitor.industry || 'Industrie non renseignée'}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>{competitor.location || 'Non renseignée'}</TableCell>
+                        <TableCell>{competitor.connection_count ? competitor.connection_count.toLocaleString() : 'N/A'}</TableCell>
+                        <TableCell>{competitor.follower_count ? competitor.follower_count.toLocaleString() : 'N/A'}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className={`${getStatusColor(competitor.status)} text-white`}>
+                            {competitor.status || 'unknown'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => setSelectedCompetitor(competitor)}
+                            >
+                              <Eye className="h-3 w-3" />
+                            </Button>
+                            {competitor.url && (
+                              <Button size="sm" variant="outline" asChild>
+                                <a href={competitor.url} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-3 w-3" />
+                                </a>
+                              </Button>
+                            )}
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => deleteCompetitor(competitor.id)}
+                            >
+                              <Trash2 className="h-3 w-3 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Version mobile responsive */}
+              <div className="md:hidden space-y-4">
+                {filteredCompetitors.map((competitor) => (
+                  <Card key={competitor.id} className="p-4">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-16 h-16 rounded-full overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
+                        {competitor.photo_profil ? (
+                          <img 
+                            src={competitor.photo_profil} 
+                            alt={competitor.name || 'Photo de profil'} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                            }}
+                          />
+                        ) : null}
+                        <div className={`text-lg font-medium ${competitor.photo_profil ? 'hidden' : ''}`}>
+                          {competitor.name?.charAt(0)?.toUpperCase() || '?'}
                         </div>
-                      </TableCell>
-                      <TableCell>{competitor.entreprise}</TableCell>
-                      <TableCell>{competitor.industry}</TableCell>
-                      <TableCell>{competitor.follower_count?.toLocaleString()}</TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className={`${getStatusColor(competitor.status)} text-white`}>
-                          {competitor.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-base truncate">{competitor.name || 'Non renseigné'}</h3>
+                            <p className="text-sm text-muted-foreground line-clamp-2">{competitor.headline || 'Titre non renseigné'}</p>
+                          </div>
+                          <Badge variant="secondary" className={`${getStatusColor(competitor.status)} text-white ml-2 flex-shrink-0`}>
+                            {competitor.status || 'unknown'}
+                          </Badge>
+                        </div>
+                        <div className="mt-2 space-y-1 text-sm">
+                          <div><span className="font-medium">Entreprise:</span> {competitor.entreprise || 'Non renseignée'}</div>
+                          <div><span className="font-medium">Industrie:</span> {competitor.industry || 'Non renseignée'}</div>
+                          <div><span className="font-medium">Localisation:</span> {competitor.location || 'Non renseignée'}</div>
+                          <div className="flex gap-4">
+                            <span><span className="font-medium">Connexions:</span> {competitor.connection_count ? competitor.connection_count.toLocaleString() : 'N/A'}</span>
+                            <span><span className="font-medium">Followers:</span> {competitor.follower_count ? competitor.follower_count.toLocaleString() : 'N/A'}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 mt-3">
                           <Button 
                             size="sm" 
                             variant="outline"
                             onClick={() => setSelectedCompetitor(competitor)}
                           >
-                            <Eye className="h-3 w-3" />
+                            <Eye className="h-3 w-3 mr-1" />
+                            Voir
                           </Button>
                           {competitor.url && (
                             <Button size="sm" variant="outline" asChild>
                               <a href={competitor.url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-3 w-3" />
+                                <ExternalLink className="h-3 w-3 mr-1" />
+                                LinkedIn
                               </a>
                             </Button>
                           )}
@@ -468,11 +570,11 @@ export default function Competitors() {
                             <Trash2 className="h-3 w-3 text-destructive" />
                           </Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
