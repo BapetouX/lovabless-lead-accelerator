@@ -72,25 +72,11 @@ export default function Competitors() {
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [competitorPosts, setCompetitorPosts] = useState<CompetitorPost[]>([]);
   const [selectedCompetitor, setSelectedCompetitor] = useState<Competitor | null>(null);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
-
-  // Form states
-  const [newCompetitor, setNewCompetitor] = useState({
-    id_linkedin: "",
-    name: "",
-    headline: "",
-    entreprise: "",
-    url: "",
-    follower_count: 0,
-    connection_level: "",
-    industry: "",
-    location: "",
-    notes: ""
-  });
 
   const [newPost, setNewPost] = useState({
     post_id_linkedin: "",
@@ -105,6 +91,33 @@ export default function Competitors() {
     sentiment: "",
     performance_score: 0
   });
+
+  // Realtime subscription for new competitors
+  useEffect(() => {
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'competitors'
+        },
+        (payload) => {
+          console.log('New competitor added:', payload);
+          fetchCompetitors(); // Refresh the list
+          toast({
+            title: "Nouveau concurrent",
+            description: "Un nouveau concurrent a été ajouté !",
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     fetchCompetitors();
@@ -373,7 +386,7 @@ export default function Competitors() {
           <Plus className="h-4 w-4 mr-2" />
           Ajouter concurrent
         </Button>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+      </div>
           <DialogTrigger asChild>
             <Button variant="outline">
               <Plus className="h-4 w-4 mr-2" />
@@ -472,15 +485,6 @@ export default function Competitors() {
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                Annuler
-              </Button>
-              <Button onClick={addCompetitor} className="bg-gradient-primary">
-                Ajouter
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
 
       <Tabs defaultValue="competitors" className="space-y-4">
