@@ -364,39 +364,29 @@ export default function Competitors() {
                       
                       setIsSubmitting(true);
                       try {
-                        console.log('Envoi vers webhook:', {
-                          url: 'https://n8n.srv802543.hstgr.cloud/webhook-test/ajout-concurrent',
+                        console.log('Envoi vers edge function:', {
                           data: { url: linkedinUrl.trim() }
                         });
 
-                        const response = await fetch('https://n8n.srv802543.hstgr.cloud/webhook-test/ajout-concurrent', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                            url: linkedinUrl.trim()
-                          }),
-                          mode: 'cors', // Explicitly set CORS mode
+                        const response = await supabase.functions.invoke('add-competitor', {
+                          body: { url: linkedinUrl.trim() }
                         });
 
-                        console.log('Réponse du webhook:', {
-                          status: response.status,
-                          statusText: response.statusText,
-                          ok: response.ok
+                        const { data, error } = response;
+
+                        console.log('Réponse de l\'edge function:', {
+                          data,
+                          error
                         });
 
-                        if (response.ok) {
-                          const responseData = await response.text();
-                          console.log('Données de réponse:', responseData);
-                          
+                        if (!error && data) {
                           toast({
                             title: "Succès",
                             description: "Concurrent ajouté avec succès",
                           });
                           setLinkedinUrl("");
                         } else {
-                          throw new Error(`Erreur HTTP: ${response.status} - ${response.statusText}`);
+                          throw new Error(error?.message || 'Erreur inconnue');
                         }
                       } catch (error) {
                         console.error('Erreur détaillée lors de l\'ajout du concurrent:', error);
