@@ -106,6 +106,7 @@ export type Database = {
           name: string | null
           notes: string | null
           photo_profil: string | null
+          posts_table_name: string | null
           public_identifier: string | null
           status: string | null
           updated_at: string
@@ -125,6 +126,7 @@ export type Database = {
           name?: string | null
           notes?: string | null
           photo_profil?: string | null
+          posts_table_name?: string | null
           public_identifier?: string | null
           status?: string | null
           updated_at?: string
@@ -144,6 +146,7 @@ export type Database = {
           name?: string | null
           notes?: string | null
           photo_profil?: string | null
+          posts_table_name?: string | null
           public_identifier?: string | null
           status?: string | null
           updated_at?: string
