@@ -74,7 +74,7 @@ export default function Competitors() {
   const [selectedCompetitor, setSelectedCompetitor] = useState<Competitor | null>(null);
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
   const { toast } = useToast();
 
   const [newPost, setNewPost] = useState({
@@ -255,11 +255,7 @@ export default function Competitors() {
     }
   };
 
-  const filteredCompetitors = competitors.filter(competitor =>
-    competitor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    competitor.entreprise?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    competitor.industry?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCompetitors = competitors;
 
   // Calculate KPIs
   const totalCompetitors = competitors.length;
@@ -333,25 +329,6 @@ export default function Competitors() {
         </Card>
       </div>
 
-      {/* Search and Add */}
-      <div className="flex gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher un concurrent..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <Button 
-          className="bg-gradient-primary"
-          onClick={() => window.open('https://n8n.srv802543.hstgr.cloud/webhook/ajout-concurrent', '_blank')}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Ajouter concurrent
-        </Button>
-      </div>
 
       <Tabs defaultValue="competitors" className="space-y-4">
         <TabsList>
@@ -362,10 +339,36 @@ export default function Competitors() {
         <TabsContent value="competitors" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Liste des Concurrents</CardTitle>
-              <CardDescription>
-                Gérez vos concurrents et consultez leurs informations
-              </CardDescription>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Liste des Concurrents</CardTitle>
+                  <CardDescription>
+                    Gérez vos concurrents et consultez leurs informations
+                  </CardDescription>
+                </div>
+                <div className="flex gap-4">
+                  <div className="relative">
+                    <Input
+                      placeholder="URL du profil LinkedIn..."
+                      value={linkedinUrl}
+                      onChange={(e) => setLinkedinUrl(e.target.value)}
+                      className="w-80"
+                    />
+                  </div>
+                  <Button 
+                    className="bg-gradient-primary"
+                    onClick={() => {
+                      if (linkedinUrl) {
+                        window.open(`https://n8n.srv802543.hstgr.cloud/webhook/ajout-concurrent?url=${encodeURIComponent(linkedinUrl)}`, '_blank');
+                        setLinkedinUrl("");
+                      }
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Ajouter concurrent
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <Table>
