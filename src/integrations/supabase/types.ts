@@ -93,52 +93,58 @@ export type Database = {
       }
       competitors: {
         Row: {
-          connection_level: string | null
+          a_propos: string | null
+          connection_count: number | null
           created_at: string
           entreprise: string | null
           follower_count: number | null
           headline: string | null
           id: number
-          id_linkedin: string
           industry: string | null
           last_activity_date: string | null
           location: string | null
           name: string | null
           notes: string | null
+          photo_profil: string | null
+          public_identifier: string | null
           status: string | null
           updated_at: string
           url: string | null
         }
         Insert: {
-          connection_level?: string | null
+          a_propos?: string | null
+          connection_count?: number | null
           created_at?: string
           entreprise?: string | null
           follower_count?: number | null
           headline?: string | null
           id?: number
-          id_linkedin: string
           industry?: string | null
           last_activity_date?: string | null
           location?: string | null
           name?: string | null
           notes?: string | null
+          photo_profil?: string | null
+          public_identifier?: string | null
           status?: string | null
           updated_at?: string
           url?: string | null
         }
         Update: {
-          connection_level?: string | null
+          a_propos?: string | null
+          connection_count?: number | null
           created_at?: string
           entreprise?: string | null
           follower_count?: number | null
           headline?: string | null
           id?: number
-          id_linkedin?: string
           industry?: string | null
           last_activity_date?: string | null
           location?: string | null
           name?: string | null
           notes?: string | null
+          photo_profil?: string | null
+          public_identifier?: string | null
           status?: string | null
           updated_at?: string
           url?: string | null
