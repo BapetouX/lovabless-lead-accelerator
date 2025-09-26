@@ -366,11 +366,18 @@ export default function Competitors() {
             className="pl-10"
           />
         </div>
+        <Button 
+          className="bg-gradient-primary"
+          onClick={() => window.open('https://n8n.srv802543.hstgr.cloud/webhook/ajout-concurrent', '_blank')}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Ajouter concurrent
+        </Button>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-primary">
+            <Button variant="outline">
               <Plus className="h-4 w-4 mr-2" />
-              Ajouter concurrent
+              Ajouter manuellement
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
