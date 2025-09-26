@@ -36,8 +36,8 @@ serve(async (req) => {
 
     console.log('Relaying request to n8n webhook:', { url })
 
-    // Forward the request to the n8n webhook
-    const response = await fetch('https://n8n.srv802543.hstgr.cloud/webhook-test/ajout-concurrent', {
+    // Forward the request to the n8n webhook - URL corrigée
+    const response = await fetch('https://n8n.srv802543.hstgr.cloud/webhook/ajout-concurrent', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
