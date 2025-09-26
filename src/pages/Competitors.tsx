@@ -364,6 +364,11 @@ export default function Competitors() {
                       
                       setIsSubmitting(true);
                       try {
+                        console.log('Envoi vers webhook:', {
+                          url: 'https://n8n.srv802543.hstgr.cloud/webhook-test/ajout-concurrent',
+                          data: { url: linkedinUrl.trim() }
+                        });
+
                         const response = await fetch('https://n8n.srv802543.hstgr.cloud/webhook-test/ajout-concurrent', {
                           method: 'POST',
                           headers: {
@@ -372,22 +377,41 @@ export default function Competitors() {
                           body: JSON.stringify({
                             url: linkedinUrl.trim()
                           }),
+                          mode: 'cors', // Explicitly set CORS mode
+                        });
+
+                        console.log('Réponse du webhook:', {
+                          status: response.status,
+                          statusText: response.statusText,
+                          ok: response.ok
                         });
 
                         if (response.ok) {
+                          const responseData = await response.text();
+                          console.log('Données de réponse:', responseData);
+                          
                           toast({
                             title: "Succès",
                             description: "Concurrent ajouté avec succès",
                           });
                           setLinkedinUrl("");
                         } else {
-                          throw new Error(`Erreur HTTP: ${response.status}`);
+                          throw new Error(`Erreur HTTP: ${response.status} - ${response.statusText}`);
                         }
                       } catch (error) {
-                        console.error('Erreur lors de l\'ajout du concurrent:', error);
+                        console.error('Erreur détaillée lors de l\'ajout du concurrent:', error);
+                        
+                        let errorMessage = "Impossible d'ajouter le concurrent. Veuillez réessayer.";
+                        
+                        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+                          errorMessage = "Impossible de joindre le webhook. Vérifiez que l'URL est correcte et accessible.";
+                        } else if (error instanceof Error) {
+                          errorMessage = `Erreur: ${error.message}`;
+                        }
+                        
                         toast({
                           title: "Erreur",
-                          description: "Impossible d'ajouter le concurrent. Veuillez réessayer.",
+                          description: errorMessage,
                           variant: "destructive",
                         });
                       } finally {
