@@ -9,7 +9,7 @@ import {
   Plus, 
   ExternalLink, 
   Trash2,
-  Eye
+  Edit
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -281,9 +281,9 @@ export default function Competitors() {
                         <Button 
                           size="sm" 
                           variant="outline"
-                          onClick={() => setSelectedCompetitor(competitor)}
+                          onClick={() => window.open(`/competitor-posts/${competitor.id}`, '_blank')}
                         >
-                          <Eye className="h-3 w-3" />
+                          <Edit className="h-3 w-3" />
                         </Button>
                         {competitor.url && (
                           <Button size="sm" variant="outline" asChild>
@@ -351,10 +351,10 @@ export default function Competitors() {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => setSelectedCompetitor(competitor)}
+                        onClick={() => window.open(`/competitor-posts/${competitor.id}`, '_blank')}
                       >
-                        <Eye className="h-3 w-3 mr-1" />
-                        Voir
+                        <Edit className="h-3 w-3 mr-1" />
+                        Posts
                       </Button>
                       {competitor.url && (
                         <Button size="sm" variant="outline" asChild>

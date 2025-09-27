@@ -10,6 +10,7 @@ import LeadMagnet from "./pages/LeadMagnet";
 import Content from "./pages/Content";
 import PostsList from "./pages/PostsList";
 import Competitors from "./pages/Competitors";
+import CompetitorPosts from "./pages/CompetitorPosts";
 import Leads from "./pages/Leads";
 import ContentWatch from "./pages/ContentWatch";
 import NotFound from "./pages/NotFound";
@@ -33,6 +34,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/competitor-posts/:competitorId" element={<CompetitorPosts />} />
             <Route path="/" element={<DashboardLayout />}>
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="content-watch" element={<ContentWatch />} />
