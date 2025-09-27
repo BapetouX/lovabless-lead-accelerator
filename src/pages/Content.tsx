@@ -15,16 +15,53 @@ export default function Content() {
   const [postContent, setPostContent] = useState("");
   const [keyIdea, setKeyIdea] = useState("");
   const [imagePrompt, setImagePrompt] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleCreatePost = () => {
-    // Logic pour créer le post
-    console.log("Type de post:", postType);
-    console.log("Option image:", imageOption);
-    console.log("Contenu:", postType === "full" ? postContent : keyIdea);
-    if (imageOption === "ai" && imagePrompt) {
-      console.log("Prompt image:", imagePrompt);
+  const handleCreatePost = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      const webhookData = {
+        type_post: postType,
+        contenu: postType === "full" ? postContent : keyIdea,
+        option_image: imageOption,
+        prompt_image: imageOption === "ai" ? imagePrompt : null,
+        timestamp: new Date().toISOString(),
+      };
+
+      console.log("Envoi vers webhook:", webhookData);
+
+      const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook/creation-contenu", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(webhookData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Réponse du webhook:", result);
+
+      // Réinitialiser le formulaire
+      setPostContent("");
+      setKeyIdea("");
+      setImagePrompt("");
+      setPostType("full");
+      setImageOption("upload");
+      setIsCreateDialogOpen(false);
+      
+      // Vous pouvez ajouter un toast de succès ici si vous le souhaitez
+      
+    } catch (error) {
+      console.error("Erreur lors de l'envoi vers le webhook:", error);
+      // Vous pouvez ajouter un toast d'erreur ici si vous le souhaitez
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsCreateDialogOpen(false);
   };
 
   return (
@@ -171,12 +208,13 @@ export default function Content() {
                       onClick={handleCreatePost}
                       className="flex-1 bg-gradient-primary"
                       disabled={
+                        isSubmitting ||
                         (postType === "full" && !postContent.trim()) ||
                         (postType === "idea" && !keyIdea.trim()) ||
                         (imageOption === "ai" && !imagePrompt.trim())
                       }
                     >
-                      Créer le post
+                      {isSubmitting ? "Envoi en cours..." : "Créer le post"}
                     </Button>
                   </div>
                 </div>
