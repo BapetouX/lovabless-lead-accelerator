@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { CompetitorPostsDialog } from "@/components/CompetitorPostsDialog";
 
 interface Competitor {
   id: number;
@@ -40,6 +41,8 @@ export default function Competitors() {
   const [isLoading, setIsLoading] = useState(true);
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [postsDialogOpen, setPostsDialogOpen] = useState(false);
+  const [dialogCompetitor, setDialogCompetitor] = useState<{id: number, name: string, photo_profil: string} | null>(null);
   const { toast } = useToast();
 
   // Fetch competitors
@@ -281,7 +284,14 @@ export default function Competitors() {
                         <Button 
                           size="sm" 
                           variant="outline"
-                          onClick={() => window.open(`/competitor-posts/${competitor.id}`, '_blank')}
+                          onClick={() => {
+                            setDialogCompetitor({
+                              id: competitor.id,
+                              name: competitor.name || 'Concurrent',
+                              photo_profil: competitor.photo_profil || ''
+                            });
+                            setPostsDialogOpen(true);
+                          }}
                         >
                           <Edit className="h-3 w-3" />
                         </Button>
@@ -351,7 +361,14 @@ export default function Competitors() {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => window.open(`/competitor-posts/${competitor.id}`, '_blank')}
+                        onClick={() => {
+                          setDialogCompetitor({
+                            id: competitor.id,
+                            name: competitor.name || 'Concurrent',
+                            photo_profil: competitor.photo_profil || ''
+                          });
+                          setPostsDialogOpen(true);
+                        }}
                       >
                         <Edit className="h-3 w-3 mr-1" />
                         Posts
@@ -379,6 +396,15 @@ export default function Competitors() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Dialog pour afficher les posts */}
+      {dialogCompetitor && (
+        <CompetitorPostsDialog
+          open={postsDialogOpen}
+          onOpenChange={setPostsDialogOpen}
+          competitor={dialogCompetitor}
+        />
+      )}
     </div>
   );
 }
