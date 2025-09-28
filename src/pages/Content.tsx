@@ -21,13 +21,15 @@ export default function Content() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdPosts, setCreatedPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLeadMagnet, setIsLeadMagnet] = useState(false);
 
-  // Fetch created posts
+  // Fetch created posts from Posts table
   const fetchCreatedPosts = async () => {
     try {
       const { data, error } = await supabase
-        .from('created_posts')
+        .from('Posts')
         .select('*')
+        .not('contenu', 'is', null)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -72,16 +74,17 @@ export default function Content() {
       const result = await response.json();
       console.log("Réponse du webhook:", result);
 
-      // Save to database
+      // Save to Posts table
       const { error: dbError } = await supabase
-        .from('created_posts')
+        .from('Posts')
         .insert({
-          type_post: postType,
           contenu: postType === "full" ? postContent : keyIdea,
+          poste: false,
+          leadmagnet: isLeadMagnet,
+          type_post: postType,
           option_image: imageOption,
-          prompt_image: imageOption === "ai" ? imagePrompt : null,
-          webhook_response: result
-        });
+          prompt_image: imageOption === "ai" ? imagePrompt : null
+        } as any);
 
       if (dbError) {
         console.error('Erreur lors de la sauvegarde:', dbError);
@@ -96,6 +99,7 @@ export default function Content() {
       setImagePrompt("");
       setPostType("full");
       setImageOption("upload");
+      setIsLeadMagnet(false);
       setIsCreateDialogOpen(false);
       
     } catch (error) {
@@ -187,6 +191,23 @@ export default function Content() {
                         className="min-h-[100px]"
                       />
                     )}
+                  </div>
+
+                  {/* Lead Magnet */}
+                  <div className="space-y-3">
+                    <Label className="text-base font-semibold">Type de post</Label>
+                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border">
+                      <input
+                        type="checkbox"
+                        id="leadmagnet"
+                        checked={isLeadMagnet}
+                        onChange={(e) => setIsLeadMagnet(e.target.checked)}
+                        className="rounded"
+                      />
+                      <Label htmlFor="leadmagnet" className="cursor-pointer">
+                        Ce post contient un lead magnet
+                      </Label>
+                    </div>
                   </div>
 
                   {/* Options d'image */}
@@ -335,13 +356,25 @@ export default function Content() {
                   {createdPosts.map((post) => (
                     <TableRow key={post.id}>
                       <TableCell>
-                        <Badge variant={post.type_post === 'full' ? 'default' : 'secondary'}>
-                          {post.type_post === 'full' ? (
-                            <><FileText className="h-3 w-3 mr-1" /> Post entier</>
-                          ) : (
-                            <><Lightbulb className="h-3 w-3 mr-1" /> Idée clé</>
+                        <div className="flex gap-1 flex-wrap">
+                          <Badge variant={post.type_post === 'full' ? 'default' : 'secondary'}>
+                            {post.type_post === 'full' ? (
+                              <><FileText className="h-3 w-3 mr-1" /> Post entier</>
+                            ) : (
+                              <><Lightbulb className="h-3 w-3 mr-1" /> Idée clé</>
+                            )}
+                          </Badge>
+                          {post.leadmagnet && (
+                            <Badge variant="default" className="text-xs">
+                              Lead Magnet
+                            </Badge>
                           )}
-                        </Badge>
+                          {post.poste && (
+                            <Badge variant="secondary" className="text-xs">
+                              Posté
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="max-w-md">
                         <p className="truncate text-sm">

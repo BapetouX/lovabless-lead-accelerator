@@ -19,12 +19,19 @@ type Post = {
   media?: string | null;
   urn_post_id?: string | null;
   Url_lead_magnet?: string | null;
+  poste?: boolean | null;
+  leadmagnet?: boolean | null;
+  type_post?: string | null;
+  contenu?: string | null;
+  option_image?: string | null;
+  prompt_image?: string | null;
 }
 
 export default function PostsList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [leadMagnetUrls, setLeadMagnetUrls] = useState<{[key: number]: string}>({});
+  const [activeTab, setActiveTab] = useState<"posted" | "not-posted">("not-posted");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -193,6 +200,10 @@ export default function PostsList() {
     );
   }
 
+  const postsPosted = posts.filter(post => post.poste === true);
+  const postsNotPosted = posts.filter(post => post.poste !== true);
+  const currentPosts = activeTab === "posted" ? postsPosted : postsNotPosted;
+
   return (
     <div className="space-y-6">
       <div>
@@ -202,19 +213,49 @@ export default function PostsList() {
         </p>
       </div>
 
-      {posts.length === 0 ? (
+      {/* Tabs pour filtrer les posts */}
+      <div className="flex space-x-1 bg-muted p-1 rounded-lg w-fit">
+        <Button
+          variant={activeTab === "not-posted" ? "default" : "ghost"}
+          size="sm"
+          onClick={() => setActiveTab("not-posted")}
+          className="relative"
+        >
+          Posts non postés
+          <Badge variant="secondary" className="ml-2">
+            {postsNotPosted.length}
+          </Badge>
+        </Button>
+        <Button
+          variant={activeTab === "posted" ? "default" : "ghost"}
+          size="sm"
+          onClick={() => setActiveTab("posted")}
+          className="relative"
+        >
+          Posts postés
+          <Badge variant="secondary" className="ml-2">
+            {postsPosted.length}
+          </Badge>
+        </Button>
+      </div>
+
+      {currentPosts.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Database className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">Aucun post trouvé</h3>
+            <h3 className="text-lg font-medium mb-2">
+              {activeTab === "posted" ? "Aucun post posté" : "Aucun post non posté"}
+            </h3>
             <p className="text-muted-foreground text-center">
-              Aucun post n'a été trouvé dans la base de données.
+              {activeTab === "posted" 
+                ? "Aucun post n'a encore été publié." 
+                : "Aucun post en attente de publication."}
             </p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
-          {posts.map((post) => (
+          {currentPosts.map((post) => (
             <Card key={post.id} className="group hover:shadow-lg transition-all duration-300 hover-scale">
               <CardHeader className="pb-4">
                 <div className="space-y-3">
@@ -222,9 +263,21 @@ export default function PostsList() {
                     <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors">
                       Post {post.id}
                     </CardTitle>
-                    <Badge variant="outline" className="shrink-0 text-xs">
-                      #{post.Post_id || post.id}
-                    </Badge>
+                    <div className="flex gap-2 shrink-0">
+                      {post.poste && (
+                        <Badge variant="secondary" className="text-xs">
+                          Posté
+                        </Badge>
+                      )}
+                      {post.leadmagnet && (
+                        <Badge variant="default" className="text-xs">
+                          Lead Magnet
+                        </Badge>
+                      )}
+                      <Badge variant="outline" className="text-xs">
+                        #{post.Post_id || post.id}
+                      </Badge>
+                    </div>
                   </div>
                   
                   <CardDescription className="flex items-center gap-2 text-sm">
@@ -241,34 +294,48 @@ export default function PostsList() {
               
               <CardContent className="pt-0">
                 <div className="space-y-3">
-                  {/* Section Lead Magnet */}
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Lead Magnet URL:</h4>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Coller l'URL du lead magnet..."
-                        value={leadMagnetUrls[post.id] || ''}
-                        onChange={(e) => setLeadMagnetUrls(prev => ({
-                          ...prev,
-                          [post.id]: e.target.value
-                        }))}
-                        className="flex-1"
-                      />
-                      <Button
-                        size="sm"
-                        onClick={() => handleUpdateLeadMagnet(post.id, leadMagnetUrls[post.id] || '')}
-                        disabled={!leadMagnetUrls[post.id]?.trim()}
-                      >
-                        <Save className="h-4 w-4 mr-1" />
-                        OK
-                      </Button>
-                    </div>
-                    {post.Url_lead_magnet && (
-                      <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
-                        Actuel: <a href={post.Url_lead_magnet} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">{post.Url_lead_magnet}</a>
+                  {/* Afficher le contenu du post créé s'il existe */}
+                  {post.contenu && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium text-muted-foreground">Contenu:</h4>
+                      <div className="text-xs bg-muted/50 p-2 rounded">
+                        {post.contenu.length > 150 
+                          ? `${post.contenu.substring(0, 150)}...` 
+                          : post.contenu}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
+
+                  {/* Section Lead Magnet - uniquement si leadmagnet = true */}
+                  {post.leadmagnet && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium text-muted-foreground">Lead Magnet URL:</h4>
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Coller l'URL du lead magnet..."
+                          value={leadMagnetUrls[post.id] || ''}
+                          onChange={(e) => setLeadMagnetUrls(prev => ({
+                            ...prev,
+                            [post.id]: e.target.value
+                          }))}
+                          className="flex-1"
+                        />
+                        <Button
+                          size="sm"
+                          onClick={() => handleUpdateLeadMagnet(post.id, leadMagnetUrls[post.id] || '')}
+                          disabled={!leadMagnetUrls[post.id]?.trim()}
+                        >
+                          <Save className="h-4 w-4 mr-1" />
+                          OK
+                        </Button>
+                      </div>
+                      {post.Url_lead_magnet && (
+                        <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+                          Actuel: <a href={post.Url_lead_magnet} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">{post.Url_lead_magnet}</a>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   <div className="flex gap-2">
                     <Dialog>
@@ -412,21 +479,28 @@ export default function PostsList() {
                       </DialogContent>
                     </Dialog>
                     
-                    {post.table_exist ? (
-                      <Badge variant="secondary" className="flex-1 justify-center py-2">
-                        <Database className="h-4 w-4 mr-2" />
-                        Table créée
-                      </Badge>
+                    {/* Bouton création table - uniquement si leadmagnet = true */}
+                    {post.leadmagnet ? (
+                      post.table_exist ? (
+                        <Badge variant="secondary" className="flex-1 justify-center py-2">
+                          <Database className="h-4 w-4 mr-2" />
+                          Table créée
+                        </Badge>
+                      ) : (
+                        <Button 
+                          variant="default" 
+                          size="sm"
+                          className="flex-1 bg-blue-500/70 hover:bg-blue-500/90 text-white border-0"
+                          onClick={() => handleCreateTable(post.id)}
+                        >
+                          <Database className="h-4 w-4 mr-2" />
+                          Créer table
+                        </Button>
+                      )
                     ) : (
-                      <Button 
-                        variant="default" 
-                        size="sm"
-                        className="flex-1 bg-blue-500/70 hover:bg-blue-500/90 text-white border-0"
-                        onClick={() => handleCreateTable(post.id)}
-                      >
-                        <Database className="h-4 w-4 mr-2" />
-                        Créer table
-                      </Button>
+                      <div className="flex-1 text-center text-xs text-muted-foreground py-2">
+                        Pas de lead magnet
+                      </div>
                     )}
                   </div>
                 </div>

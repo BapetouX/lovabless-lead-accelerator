@@ -142,54 +142,21 @@ export type Database = {
         }
         Relationships: []
       }
-      created_posts: {
-        Row: {
-          contenu: string
-          created_at: string
-          id: number
-          image: string | null
-          option_image: string
-          prompt_image: string | null
-        }
-        Insert: {
-          contenu: string
-          created_at?: string
-          id?: number
-          image?: string | null
-          option_image: string
-          prompt_image?: string | null
-        }
-        Update: {
-          contenu?: string
-          created_at?: string
-          id?: number
-          image?: string | null
-          option_image?: string
-          prompt_image?: string | null
-        }
-        Relationships: []
-      }
       exemple_redaction_post: {
         Row: {
-          content: string
           created_at: string
           id: number
-          post_type: string
-          title: string
+          rédaction: string
         }
         Insert: {
-          content: string
           created_at?: string
           id?: number
-          post_type: string
-          title: string
+          rédaction: string
         }
         Update: {
-          content?: string
           created_at?: string
           id?: number
-          post_type?: string
-          title?: string
+          rédaction?: string
         }
         Relationships: []
       }
@@ -266,39 +233,57 @@ export type Database = {
         Row: {
           Caption: string | null
           comments_table_name: string | null
+          contenu: string | null
           created_at: string
           id: number
           keyword: string | null
+          leadmagnet: boolean | null
           media: string | null
+          option_image: string | null
           Post_id: number | null
           post_url: string | null
+          poste: boolean | null
+          prompt_image: string | null
           table_exist: boolean | null
+          type_post: string | null
           Url_lead_magnet: string | null
           urn_post_id: string | null
         }
         Insert: {
           Caption?: string | null
           comments_table_name?: string | null
+          contenu?: string | null
           created_at: string
           id?: number
           keyword?: string | null
+          leadmagnet?: boolean | null
           media?: string | null
+          option_image?: string | null
           Post_id?: number | null
           post_url?: string | null
+          poste?: boolean | null
+          prompt_image?: string | null
           table_exist?: boolean | null
+          type_post?: string | null
           Url_lead_magnet?: string | null
           urn_post_id?: string | null
         }
         Update: {
           Caption?: string | null
           comments_table_name?: string | null
+          contenu?: string | null
           created_at?: string
           id?: number
           keyword?: string | null
+          leadmagnet?: boolean | null
           media?: string | null
+          option_image?: string | null
           Post_id?: number | null
           post_url?: string | null
+          poste?: boolean | null
+          prompt_image?: string | null
           table_exist?: boolean | null
+          type_post?: string | null
           Url_lead_magnet?: string | null
           urn_post_id?: string | null
         }
