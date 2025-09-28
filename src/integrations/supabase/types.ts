@@ -147,31 +147,49 @@ export type Database = {
           contenu: string
           created_at: string
           id: number
+          image: string | null
           option_image: string
           prompt_image: string | null
-          type_post: string
-          updated_at: string
-          webhook_response: Json | null
         }
         Insert: {
           contenu: string
           created_at?: string
           id?: number
+          image?: string | null
           option_image: string
           prompt_image?: string | null
-          type_post: string
-          updated_at?: string
-          webhook_response?: Json | null
         }
         Update: {
           contenu?: string
           created_at?: string
           id?: number
+          image?: string | null
           option_image?: string
           prompt_image?: string | null
-          type_post?: string
-          updated_at?: string
-          webhook_response?: Json | null
+        }
+        Relationships: []
+      }
+      exemple_redaction_post: {
+        Row: {
+          content: string
+          created_at: string
+          id: number
+          post_type: string
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: number
+          post_type: string
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: number
+          post_type?: string
+          title?: string
         }
         Relationships: []
       }
