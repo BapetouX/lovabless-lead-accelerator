@@ -22,6 +22,8 @@ export default function Content() {
   const [createdPosts, setCreatedPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLeadMagnet, setIsLeadMagnet] = useState(false);
+  const [hasCTA, setHasCTA] = useState(false);
+  const [ctaKeyword, setCtaKeyword] = useState("");
 
   // Fetch created posts from Posts table
   const fetchCreatedPosts = async () => {
@@ -54,6 +56,8 @@ export default function Content() {
         contenu: postType === "full" ? postContent : keyIdea,
         option_image: imageOption,
         prompt_image: imageOption === "ai" ? imagePrompt : null,
+        has_cta: hasCTA,
+        cta_keyword: hasCTA ? ctaKeyword : null,
         timestamp: new Date().toISOString(),
       };
 
@@ -83,7 +87,8 @@ export default function Content() {
           leadmagnet: isLeadMagnet,
           type_post: postType,
           option_image: imageOption,
-          prompt_image: imageOption === "ai" ? imagePrompt : null
+          prompt_image: imageOption === "ai" ? imagePrompt : null,
+          keyword: hasCTA ? ctaKeyword : null
         } as any);
 
       if (dbError) {
@@ -100,6 +105,8 @@ export default function Content() {
       setPostType("full");
       setImageOption("upload");
       setIsLeadMagnet(false);
+      setHasCTA(false);
+      setCtaKeyword("");
       setIsCreateDialogOpen(false);
       
     } catch (error) {
@@ -195,18 +202,45 @@ export default function Content() {
 
                   {/* Lead Magnet */}
                   <div className="space-y-3">
-                    <Label className="text-base font-semibold">Type de post</Label>
-                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-border">
-                      <input
-                        type="checkbox"
-                        id="leadmagnet"
-                        checked={isLeadMagnet}
-                        onChange={(e) => setIsLeadMagnet(e.target.checked)}
-                        className="rounded"
-                      />
-                      <Label htmlFor="leadmagnet" className="cursor-pointer">
-                        Ce post contient un lead magnet
-                      </Label>
+                    <Label className="text-base font-semibold">Options du post</Label>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-border">
+                        <input
+                          type="checkbox"
+                          id="leadmagnet"
+                          checked={isLeadMagnet}
+                          onChange={(e) => setIsLeadMagnet(e.target.checked)}
+                          className="rounded"
+                        />
+                        <Label htmlFor="leadmagnet" className="cursor-pointer">
+                          Ce post contient un lead magnet
+                        </Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-border">
+                        <input
+                          type="checkbox"
+                          id="cta"
+                          checked={hasCTA}
+                          onChange={(e) => setHasCTA(e.target.checked)}
+                          className="rounded"
+                        />
+                        <Label htmlFor="cta" className="cursor-pointer">
+                          Ajouter un CTA (demande de commentaire avec mot-clé)
+                        </Label>
+                      </div>
+                      
+                      {hasCTA && (
+                        <div className="ml-6">
+                          <Label className="text-sm">Mot-clé pour le CTA</Label>
+                          <Input
+                            placeholder="Ex: GRATUIT, GUIDE, INFO..."
+                            value={ctaKeyword}
+                            onChange={(e) => setCtaKeyword(e.target.value)}
+                            className="mt-2"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -274,7 +308,8 @@ export default function Content() {
                         isSubmitting ||
                         (postType === "full" && !postContent.trim()) ||
                         (postType === "idea" && !keyIdea.trim()) ||
-                        (imageOption === "ai" && !imagePrompt.trim())
+                        (imageOption === "ai" && !imagePrompt.trim()) ||
+                        (hasCTA && !ctaKeyword.trim())
                       }
                     >
                       {isSubmitting ? "Envoi en cours..." : "Créer le post"}
