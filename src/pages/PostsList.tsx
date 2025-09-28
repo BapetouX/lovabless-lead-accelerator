@@ -261,7 +261,11 @@ export default function PostsList() {
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors">
-                      Post {post.id}
+                      {(() => {
+                        const description = post.Caption || post.contenu || '';
+                        const firstThreeWords = description.split(' ').slice(0, 3).join(' ');
+                        return firstThreeWords || `Post ${post.id}`;
+                      })()}
                     </CardTitle>
                     <div className="flex gap-2 shrink-0">
                       {post.poste && (
