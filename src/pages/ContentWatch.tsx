@@ -84,7 +84,7 @@ export default function ContentWatch() {
       const transformedData = data?.map(post => ({
         ...post,
         competitor: Array.isArray(post.competitors) ? post.competitors[0] : post.competitors
-      })) as CompetitorPost[];
+      })) as any[];
 
       setCompetitorPosts(transformedData || []);
     } catch (error) {

@@ -165,7 +165,7 @@ export default function CompetitorPosts() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {formatNumber(posts.reduce((sum, post) => sum + (post.shares_count || 0), 0))}
+              {formatNumber(posts.reduce((sum, post) => sum + (post.repost_count || 0), 0))}
             </div>
             <p className="text-xs text-muted-foreground">Partages totaux</p>
           </CardContent>
@@ -244,7 +244,7 @@ export default function CompetitorPosts() {
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <Repeat2 className="h-3 w-3 text-green-500" />
-                          <span className="text-sm">{formatNumber(post.shares_count || 0)}</span>
+                          <span className="text-sm">{formatNumber(post.repost_count || 0)}</span>
                         </div>
                       </TableCell>
                       <TableCell>

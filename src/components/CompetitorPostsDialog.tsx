@@ -197,7 +197,7 @@ export function CompetitorPostsDialog({ open, onOpenChange, competitor }: Compet
                       </div>
                       <div className="flex items-center gap-1">
                         <Repeat2 className="h-4 w-4 text-green-500" />
-                        <span className="text-sm">{formatNumber(post.shares_count || 0)}</span>
+                        <span className="text-sm">{formatNumber(post.repost_count || 0)}</span>
                       </div>
                     </div>
                   </div>
