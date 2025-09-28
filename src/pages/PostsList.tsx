@@ -263,7 +263,7 @@ export default function PostsList() {
                     <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors">
                       {(() => {
                         const description = post.Caption || post.contenu || '';
-                        const firstThreeWords = description.split(' ').slice(0, 3).join(' ');
+                        const firstThreeWords = description.split(' ').slice(0, 6).join(' ');
                         return firstThreeWords || `Post ${post.id}`;
                       })()}
                     </CardTitle>
