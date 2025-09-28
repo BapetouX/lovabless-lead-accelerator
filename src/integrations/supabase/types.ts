@@ -21,19 +21,15 @@ export type Database = {
           competitor_id: number
           content_type: string | null
           created_at: string
-          engagement_rate: number | null
-          hashtags: string[] | null
           id: number
-          is_analyzed: boolean | null
           keywords: string[] | null
           likes_count: number | null
-          media_urls: string[] | null
-          performance_score: number | null
+          media_urls: string | null
           post_date: string | null
           post_id_linkedin: string | null
           post_url: string | null
-          sentiment: string | null
-          shares_count: number | null
+          repost_count: number | null
+          title_carousel: string | null
           updated_at: string
           urn_post_id: string | null
         }
@@ -43,19 +39,15 @@ export type Database = {
           competitor_id: number
           content_type?: string | null
           created_at?: string
-          engagement_rate?: number | null
-          hashtags?: string[] | null
           id?: number
-          is_analyzed?: boolean | null
           keywords?: string[] | null
           likes_count?: number | null
-          media_urls?: string[] | null
-          performance_score?: number | null
+          media_urls?: string | null
           post_date?: string | null
           post_id_linkedin?: string | null
           post_url?: string | null
-          sentiment?: string | null
-          shares_count?: number | null
+          repost_count?: number | null
+          title_carousel?: string | null
           updated_at?: string
           urn_post_id?: string | null
         }
@@ -65,19 +57,15 @@ export type Database = {
           competitor_id?: number
           content_type?: string | null
           created_at?: string
-          engagement_rate?: number | null
-          hashtags?: string[] | null
           id?: number
-          is_analyzed?: boolean | null
           keywords?: string[] | null
           likes_count?: number | null
-          media_urls?: string[] | null
-          performance_score?: number | null
+          media_urls?: string | null
           post_date?: string | null
           post_id_linkedin?: string | null
           post_url?: string | null
-          sentiment?: string | null
-          shares_count?: number | null
+          repost_count?: number | null
+          title_carousel?: string | null
           updated_at?: string
           urn_post_id?: string | null
         }
@@ -151,6 +139,39 @@ export type Database = {
           status?: string | null
           updated_at?: string
           url?: string | null
+        }
+        Relationships: []
+      }
+      created_posts: {
+        Row: {
+          contenu: string
+          created_at: string
+          id: number
+          option_image: string
+          prompt_image: string | null
+          type_post: string
+          updated_at: string
+          webhook_response: Json | null
+        }
+        Insert: {
+          contenu: string
+          created_at?: string
+          id?: number
+          option_image: string
+          prompt_image?: string | null
+          type_post: string
+          updated_at?: string
+          webhook_response?: Json | null
+        }
+        Update: {
+          contenu?: string
+          created_at?: string
+          id?: number
+          option_image?: string
+          prompt_image?: string | null
+          type_post?: string
+          updated_at?: string
+          webhook_response?: Json | null
         }
         Relationships: []
       }

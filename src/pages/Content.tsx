@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,7 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { PenTool, Calendar, Clock, Lightbulb, FileText, Image, Sparkles, Upload } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { PenTool, Calendar, Clock, Lightbulb, FileText, Image, Sparkles, Upload, Type, Eye } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Content() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -16,6 +19,29 @@ export default function Content() {
   const [keyIdea, setKeyIdea] = useState("");
   const [imagePrompt, setImagePrompt] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdPosts, setCreatedPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch created posts
+  const fetchCreatedPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('created_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setCreatedPosts(data || []);
+    } catch (error) {
+      console.error('Erreur lors du chargement des posts:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCreatedPosts();
+  }, []);
 
   const handleCreatePost = async () => {
     setIsSubmitting(true);
@@ -46,6 +72,24 @@ export default function Content() {
       const result = await response.json();
       console.log("Réponse du webhook:", result);
 
+      // Save to database
+      const { error: dbError } = await supabase
+        .from('created_posts')
+        .insert({
+          type_post: postType,
+          contenu: postType === "full" ? postContent : keyIdea,
+          option_image: imageOption,
+          prompt_image: imageOption === "ai" ? imagePrompt : null,
+          webhook_response: result
+        });
+
+      if (dbError) {
+        console.error('Erreur lors de la sauvegarde:', dbError);
+      }
+
+      // Refresh posts list
+      await fetchCreatedPosts();
+
       // Réinitialiser le formulaire
       setPostContent("");
       setKeyIdea("");
@@ -53,8 +97,6 @@ export default function Content() {
       setPostType("full");
       setImageOption("upload");
       setIsCreateDialogOpen(false);
-      
-      // Vous pouvez ajouter un toast de succès ici si vous le souhaitez
       
     } catch (error) {
       console.error("Erreur lors de l'envoi vers le webhook:", error);
@@ -253,6 +295,88 @@ export default function Content() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Table des posts créés */}
+      <Card className="shadow-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Eye className="h-5 w-5 text-primary" />
+            Mes posts créés
+          </CardTitle>
+          <CardDescription>
+            Tous vos posts créés et envoyés vers le webhook
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Chargement...</p>
+            </div>
+          ) : createdPosts.length === 0 ? (
+            <div className="text-center py-8">
+              <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">Aucun post créé pour le moment</p>
+              <p className="text-sm text-muted-foreground">
+                Commencez par créer votre premier post ci-dessus
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Contenu</TableHead>
+                    <TableHead>Image</TableHead>
+                    <TableHead>Date de création</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {createdPosts.map((post) => (
+                    <TableRow key={post.id}>
+                      <TableCell>
+                        <Badge variant={post.type_post === 'full' ? 'default' : 'secondary'}>
+                          {post.type_post === 'full' ? (
+                            <><FileText className="h-3 w-3 mr-1" /> Post entier</>
+                          ) : (
+                            <><Lightbulb className="h-3 w-3 mr-1" /> Idée clé</>
+                          )}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="max-w-md">
+                        <p className="truncate text-sm">
+                          {post.contenu.length > 100 
+                            ? `${post.contenu.substring(0, 100)}...` 
+                            : post.contenu
+                          }
+                        </p>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {post.option_image === 'upload' ? (
+                            <><Upload className="h-3 w-3 mr-1" /> Upload</>
+                          ) : (
+                            <><Sparkles className="h-3 w-3 mr-1" /> IA</>
+                          )}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {new Date(post.created_at).toLocaleDateString('fr-FR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card className="shadow-card bg-gradient-subtle">
         <CardContent className="p-8 text-center">
