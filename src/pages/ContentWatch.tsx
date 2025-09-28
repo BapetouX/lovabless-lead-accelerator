@@ -141,42 +141,6 @@ export default function ContentWatch() {
         </p>
       </div>
 
-      {/* Trending Topics */}
-      <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            Sujets tendance
-          </CardTitle>
-          <CardDescription>
-            Les sujets les plus populaires cette semaine
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {trendingTopics.map((topic, index) => (
-              <div key={index} className="p-4 rounded-lg bg-secondary/50 border border-border">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-foreground">{topic.topic}</h3>
-                  <Badge variant="secondary" className="text-primary bg-primary-light">
-                    {topic.trend}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <MessageCircle className="h-3 w-3" />
-                    {topic.posts} posts
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3" />
-                    {topic.engagement} engagement
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Recent Posts Table (7 derniers jours) */}
       <Card className="shadow-card">
