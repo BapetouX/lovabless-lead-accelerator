@@ -1,38 +1,43 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, MessageCircle, Target, Eye, Heart } from "lucide-react";
-
-const stats = [
-  {
-    title: "Posts publiés",
-    value: "24",
-    change: "+12% ce mois",
-    icon: TrendingUp,
-    color: "text-primary",
-  },
-  {
-    title: "Taux d'engagement",
-    value: "8.4%",
-    change: "+2.1% vs mois dernier",
-    icon: Heart,
-    color: "text-primary",
-  },
-  {
-    title: "Leads générés",
-    value: "156",
-    change: "+34 cette semaine",
-    icon: Target,
-    color: "text-primary",
-  },
-  {
-    title: "Vues de profil",
-    value: "2,847",
-    change: "+18% ce mois",
-    icon: Eye,
-    color: "text-primary",
-  },
-];
+import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { useRecentActivity } from "@/hooks/useRecentActivity";
 
 export default function Dashboard() {
+  const { data: stats, isLoading: statsLoading } = useDashboardStats();
+  const { data: recentActivity, isLoading: activityLoading } = useRecentActivity();
+
+  const statsCards = [
+    {
+      title: "Posts publiés",
+      value: statsLoading ? "..." : stats?.publishedPosts.toString() || "0",
+      change: `+${stats?.postsThisMonth || 0} ce mois`,
+      icon: TrendingUp,
+      color: "text-primary",
+    },
+    {
+      title: "Taux d'engagement",
+      value: statsLoading ? "..." : `${stats?.engagementRate || 0}%`,
+      change: "Moyenne concurrents",
+      icon: Heart,
+      color: "text-primary",
+    },
+    {
+      title: "Leads générés",
+      value: statsLoading ? "..." : stats?.totalLeads.toString() || "0",
+      change: `+${stats?.leadsThisMonth || 0} ce mois`,
+      icon: Target,
+      color: "text-primary",
+    },
+    {
+      title: "Concurrents suivis",
+      value: statsLoading ? "..." : stats?.competitorsCount.toString() || "0",
+      change: "Analyse continue",
+      icon: Users,
+      color: "text-primary",
+    },
+  ];
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="space-y-2">
@@ -44,7 +49,7 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
+        {statsCards.map((stat) => (
           <Card key={stat.title} className="shadow-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -71,20 +76,29 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[
-                { action: "Nouveau post publié", time: "Il y a 2h", type: "post" },
-                { action: "15 nouveaux commentaires", time: "Il y a 4h", type: "comment" },
-                { action: "Profile visité 23 fois", time: "Aujourd'hui", type: "view" },
-                { action: "5 nouveaux followers", time: "Hier", type: "follow" },
-              ].map((activity, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 rounded-lg bg-secondary/50">
-                  <div className="h-2 w-2 bg-primary rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{activity.action}</p>
-                    <p className="text-xs text-muted-foreground">{activity.time}</p>
-                  </div>
+              {activityLoading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="flex items-center space-x-3 p-3 rounded-lg bg-secondary/50 animate-pulse">
+                      <div className="h-2 w-2 bg-muted rounded-full"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-muted rounded w-3/4 mb-1"></div>
+                        <div className="h-3 bg-muted rounded w-1/2"></div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                recentActivity?.map((activity, index) => (
+                  <div key={index} className="flex items-center space-x-3 p-3 rounded-lg bg-secondary/50">
+                    <div className="h-2 w-2 bg-primary rounded-full"></div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{activity.action}</p>
+                      <p className="text-xs text-muted-foreground">{activity.time}</p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
@@ -96,26 +110,57 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[
-                { goal: "Posts à publier", current: 18, target: 25, percentage: 72 },
-                { goal: "Leads à générer", current: 156, target: 200, percentage: 78 },
-                { goal: "Engagement rate", current: 8.4, target: 10, percentage: 84 },
-              ].map((goal, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium">{goal.goal}</span>
-                    <span className="text-muted-foreground">
-                      {goal.current}/{goal.target}
-                    </span>
-                  </div>
-                  <div className="w-full bg-secondary rounded-full h-2">
-                    <div
-                      className="bg-gradient-primary h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${goal.percentage}%` }}
-                    />
-                  </div>
+              {statsLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="space-y-2 animate-pulse">
+                      <div className="flex justify-between">
+                        <div className="h-4 bg-muted rounded w-1/3"></div>
+                        <div className="h-4 bg-muted rounded w-1/4"></div>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-2">
+                        <div className="bg-muted h-2 rounded-full w-2/3"></div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                [
+                  { 
+                    goal: "Posts à publier", 
+                    current: stats?.postsThisMonth || 0, 
+                    target: 25, 
+                    percentage: Math.min(((stats?.postsThisMonth || 0) / 25) * 100, 100) 
+                  },
+                  { 
+                    goal: "Leads à générer", 
+                    current: stats?.leadsThisMonth || 0, 
+                    target: 50, 
+                    percentage: Math.min(((stats?.leadsThisMonth || 0) / 50) * 100, 100) 
+                  },
+                  { 
+                    goal: "Engagement rate", 
+                    current: parseFloat(stats?.engagementRate || "0"), 
+                    target: 100, 
+                    percentage: Math.min(parseFloat(stats?.engagementRate || "0"), 100) 
+                  },
+                ].map((goal, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="font-medium">{goal.goal}</span>
+                      <span className="text-muted-foreground">
+                        {goal.current}/{goal.target}
+                      </span>
+                    </div>
+                    <div className="w-full bg-secondary rounded-full h-2">
+                      <div
+                        className="bg-gradient-primary h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${goal.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
