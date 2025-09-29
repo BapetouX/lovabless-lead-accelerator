@@ -413,33 +413,15 @@ export default function PostsList() {
               </DialogContent>
             </Dialog>
 
-            {!post.table_exist ? (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() => handleCreateTable(post.id)}
-                className="flex-1"
-              >
-                <Database className="h-4 w-4 mr-2" />
-                Créer une table
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1"
-                asChild
-              >
-                <a 
-                  href={`/post-comments/${post.id}`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                >
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Statistiques
-                </a>
-              </Button>
-            )}
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => handleCreateTable(post.id)}
+              className="flex-1"
+            >
+              <Database className="h-4 w-4 mr-2" />
+              Créer une table
+            </Button>
           </div>
         </div>
       </CardContent>
