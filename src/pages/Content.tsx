@@ -35,7 +35,6 @@ export default function Content() {
       const { data, error } = await supabase
         .from('Posts')
         .select('*')
-        .not('contenu', 'is', null)
         .order('written_created_at', { ascending: false });
 
       if (error) throw error;
@@ -53,6 +52,9 @@ export default function Content() {
 
   const handleCreatePost = async () => {
     setIsSubmitting(true);
+    
+    // Fermer la modal immédiatement
+    setIsCreateDialogOpen(false);
     
     try {
       const webhookData = {
@@ -83,37 +85,10 @@ export default function Content() {
       const result = await response.json();
       console.log("Réponse du webhook:", result);
 
-      // Save to Posts table with proper status based on saveAsType
-      const { error: dbError } = await supabase
-        .from('Posts')
-        .insert({
-          contenu: postType === "full" ? postContent : keyIdea,
-          poste: saveAsType === "publish",
-          brouillon: saveAsType === "draft",
-          planifie: saveAsType === "schedule",
-          leadmagnet: isLeadMagnet,
-          type_post: postType,
-          option_image: imageOption,
-          prompt_image: imageOption === "ai" ? imagePrompt : null,
-          keyword: hasCTA ? ctaKeyword : null
-        } as any);
-
-      if (dbError) {
-        console.error('Erreur lors de la sauvegarde:', dbError);
-        toast({
-          title: "Erreur",
-          description: "Erreur lors de la sauvegarde en base de données",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Succès",
-          description: `Post ${saveAsType === "draft" ? "sauvé en brouillon" : saveAsType === "schedule" ? "planifié" : "créé"} avec succès`,
-        });
-      }
-
-      // Refresh posts list
-      await fetchCreatedPosts();
+      toast({
+        title: "Post envoyé",
+        description: `Post ${saveAsType === "draft" ? "sauvé en brouillon" : saveAsType === "schedule" ? "planifié" : "créé"} et envoyé au workflow`,
+      });
 
       // Réinitialiser le formulaire
       setPostContent("");
@@ -125,7 +100,18 @@ export default function Content() {
       setHasCTA(false);
       setCtaKeyword("");
       setSaveAsType("publish");
-      setIsCreateDialogOpen(false);
+
+      // Refresh des posts plus fréquent pendant 30 secondes pour détecter le nouveau post
+      let attempts = 0;
+      const maxAttempts = 15; // 15 tentatives sur 30 secondes
+      const checkForNewPost = setInterval(async () => {
+        attempts++;
+        await fetchCreatedPosts();
+        
+        if (attempts >= maxAttempts) {
+          clearInterval(checkForNewPost);
+        }
+      }, 2000); // Vérifier toutes les 2 secondes
       
     } catch (error) {
       console.error("Erreur lors de l'envoi vers le webhook:", error);
