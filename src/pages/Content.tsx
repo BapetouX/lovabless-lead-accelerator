@@ -314,9 +314,9 @@ export default function Content() {
             media: post.url_media,
             added_at: post.written_created_at,
             type_post: 'creation',
-            brouillon: post.statut === 'brouillon' || !post.statut,
-            planifie: post.statut === 'planifié',
-            poste: post.statut === 'publié'
+            brouillon: post.statut?.toLowerCase() === 'brouillon' || !post.statut,
+            planifie: post.statut?.toLowerCase() === 'planifié',
+            poste: post.statut?.toLowerCase() === 'publié'
           }));
           allPosts = [...allPosts, ...adaptedCreationPosts];
         }
