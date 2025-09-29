@@ -10,7 +10,7 @@ type Post = {
   id: number;
   Caption: string | null;
   post_url: string | null;
-  written_created_at: string;
+  added_at: string;
   comments_table_name: string | null;
   table_exist: boolean | null;
 };
@@ -40,8 +40,8 @@ export default function LeadMagnet() {
       const { data, error } = await supabase
         .from('Posts En Ligne')
         .select('*')
-        .eq('table_exist', true)
-        .order('written_created_at', { ascending: false });
+        .not('comments_table_name', 'is', null)
+        .order('added_at', { ascending: false });
 
       if (error) throw error;
       setPosts(data || []);
@@ -238,7 +238,7 @@ export default function LeadMagnet() {
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="secondary" className="text-xs">
-                          {new Date(post.written_created_at).toLocaleDateString()}
+                          {new Date(post.added_at).toLocaleDateString()}
                         </Badge>
                         {post.post_url && (
                           <a
