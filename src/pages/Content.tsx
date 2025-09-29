@@ -71,32 +71,66 @@ const PostDetailsCard = ({ post }: { post: any }) => {
 
   const handlePublish = async () => {
     try {
+      console.log("🚀 Début de la publication du post:", {
+        post_id: post.id,
+        content_length: editedContent.length,
+        media: post.media
+      });
+
+      const requestData = {
+        action: "publish",
+        post_id: post.id,
+        content: editedContent,
+        media: post.media,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log("📤 Données envoyées:", requestData);
+
       const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook/planification-et-post", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          action: "publish",
-          post_id: post.id,
-          content: editedContent,
-          media: post.media,
-          timestamp: new Date().toISOString()
-        })
+        body: JSON.stringify(requestData)
+      });
+
+      console.log("📥 Réponse reçue:", {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
       });
 
       if (response.ok) {
+        const responseData = await response.json().catch(() => ({}));
+        console.log("✅ Réponse JSON:", responseData);
+        
         toast({
           title: "Succès",
           description: "Post publié avec succès",
         });
       } else {
-        throw new Error("Erreur lors de la publication");
+        const errorText = await response.text().catch(() => 'Erreur inconnue');
+        console.error("❌ Erreur HTTP:", {
+          status: response.status,
+          statusText: response.statusText,
+          errorText
+        });
+        throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
+      console.error("💥 Erreur complète:", error);
+      
+      let errorMessage = "Impossible de publier le post";
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorMessage = "Impossible de joindre le serveur n8n. Vérifiez la connexion.";
+      } else if (error instanceof Error) {
+        errorMessage = `Erreur: ${error.message}`;
+      }
+
       toast({
-        title: "Erreur",
-        description: "Impossible de publier le post",
+        title: "Erreur de publication",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -104,32 +138,66 @@ const PostDetailsCard = ({ post }: { post: any }) => {
 
   const handleSchedule = async () => {
     try {
+      console.log("📅 Début de la planification du post:", {
+        post_id: post.id,
+        content_length: editedContent.length,
+        media: post.media
+      });
+
+      const requestData = {
+        action: "schedule",
+        post_id: post.id,
+        content: editedContent,
+        media: post.media,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log("📤 Données envoyées:", requestData);
+
       const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook/planification-et-post", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          action: "schedule",
-          post_id: post.id,
-          content: editedContent,
-          media: post.media,
-          timestamp: new Date().toISOString()
-        })
+        body: JSON.stringify(requestData)
+      });
+
+      console.log("📥 Réponse reçue:", {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
       });
 
       if (response.ok) {
+        const responseData = await response.json().catch(() => ({}));
+        console.log("✅ Réponse JSON:", responseData);
+        
         toast({
           title: "Succès",
           description: "Post planifié avec succès",
         });
       } else {
-        throw new Error("Erreur lors de la planification");
+        const errorText = await response.text().catch(() => 'Erreur inconnue');
+        console.error("❌ Erreur HTTP:", {
+          status: response.status,
+          statusText: response.statusText,
+          errorText
+        });
+        throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
+      console.error("💥 Erreur complète:", error);
+      
+      let errorMessage = "Impossible de planifier le post";
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorMessage = "Impossible de joindre le serveur n8n. Vérifiez la connexion.";
+      } else if (error instanceof Error) {
+        errorMessage = `Erreur: ${error.message}`;
+      }
+
       toast({
-        title: "Erreur",
-        description: "Impossible de planifier le post",
+        title: "Erreur de planification",
+        description: errorMessage,
         variant: "destructive",
       });
     }
