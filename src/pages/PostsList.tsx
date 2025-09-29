@@ -12,7 +12,7 @@ type Post = {
   id: number;
   Post_id: number | null;
   Caption: string | null;
-  written_created_at: string;
+  added_at: string;
   table_exist?: boolean | null;
   keyword?: string | null;
   post_url?: string | null;
@@ -22,9 +22,7 @@ type Post = {
   poste?: boolean | null;
   leadmagnet?: boolean | null;
   type_post?: string | null;
-  contenu?: string | null;
-  option_image?: string | null;
-  prompt_image?: string | null;
+  comments_table_name?: string | null;
 }
 
 export default function PostsList() {
@@ -51,7 +49,7 @@ export default function PostsList() {
       const { data, error } = await supabase
         .from('Posts En Ligne')
         .select('*')
-        .order('written_created_at', { ascending: false });
+        .order('added_at', { ascending: false });
 
       if (error) {
         console.error('Erreur lors de la récupération des posts:', error);
@@ -206,7 +204,7 @@ export default function PostsList() {
           <div className="flex items-start justify-between gap-2">
             <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors">
               {(() => {
-                const description = post.Caption || post.contenu || '';
+                const description = post.Caption || '';
                 const firstSixWords = description.split(' ').slice(0, 6).join(' ');
                 return firstSixWords || `Post ${post.id}`;
               })()}
@@ -241,11 +239,11 @@ export default function PostsList() {
           
           <CardDescription className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">
-              {new Date(post.written_created_at).toLocaleDateString('fr-FR', {
+              {post.added_at ? new Date(post.added_at).toLocaleDateString('fr-FR', {
                 day: 'numeric',
                 month: 'short',
                 year: 'numeric'
-              })}
+              }) : 'Date inconnue'}
             </span>
           </CardDescription>
         </div>
@@ -254,13 +252,13 @@ export default function PostsList() {
       <CardContent className="pt-0">
         <div className="space-y-3">
           {/* Afficher le contenu du post créé s'il existe */}
-          {post.contenu && (
+          {post.Caption && (
             <div className="space-y-2">
               <h4 className="text-sm font-medium text-muted-foreground">Contenu:</h4>
               <div className="text-xs bg-muted/50 p-2 rounded">
-                {post.contenu.length > 150 
-                  ? `${post.contenu.substring(0, 150)}...` 
-                  : post.contenu}
+                {post.Caption.length > 150 
+                  ? `${post.Caption.substring(0, 150)}...` 
+                  : post.Caption}
               </div>
             </div>
           )}
@@ -315,29 +313,22 @@ export default function PostsList() {
                 
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-medium text-sm text-muted-foreground mb-1">Date de création:</h4>
+                    <h4 className="font-medium text-sm text-muted-foreground mb-1">Date d'ajout:</h4>
                     <p className="text-sm">
-                      {new Date(post.written_created_at).toLocaleDateString('fr-FR', {
+                      {post.added_at ? new Date(post.added_at).toLocaleDateString('fr-FR', {
                         day: 'numeric',
                         month: 'long',
                         year: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit'
-                      })}
+                      }) : 'Date inconnue'}
                     </p>
                   </div>
 
                   {post.Caption && (
                     <div>
                       <h4 className="font-medium text-sm text-muted-foreground mb-1">Caption:</h4>
-                      <p className="text-sm leading-relaxed bg-muted/50 p-3 rounded-md">{post.Caption}</p>
-                    </div>
-                  )}
-
-                  {post.contenu && (
-                    <div>
-                      <h4 className="font-medium text-sm text-muted-foreground mb-1">Contenu généré:</h4>
-                      <p className="text-sm leading-relaxed bg-muted/50 p-3 rounded-md whitespace-pre-wrap">{post.contenu}</p>
+                      <p className="text-sm leading-relaxed bg-muted/50 p-3 rounded-md whitespace-pre-wrap">{post.Caption}</p>
                     </div>
                   )}
 
