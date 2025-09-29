@@ -420,13 +420,8 @@ export default function Content() {
               </p>
             </div>
           ) : (
-            <Tabs defaultValue="all" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="all" className="flex items-center gap-2">
-                  <Eye className="h-4 w-4" />
-                  Tous les brouillons
-                  <Badge variant="secondary">{createdPosts.length}</Badge>
-                </TabsTrigger>
+            <Tabs defaultValue="drafts" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="drafts" className="flex items-center gap-2">
                   <Save className="h-4 w-4" />
                   Brouillons
@@ -443,10 +438,6 @@ export default function Content() {
                   <Badge variant="secondary">{createdPosts.filter(p => p.poste).length}</Badge>
                 </TabsTrigger>
               </TabsList>
-
-              <TabsContent value="all" className="mt-6">
-                <PostsTable posts={createdPosts} />
-              </TabsContent>
 
               <TabsContent value="drafts" className="mt-6">
                 <PostsTable posts={createdPosts.filter(p => p.brouillon)} />
@@ -483,44 +474,49 @@ const PostsTable = ({ posts }: { posts: any[] }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Type</TableHead>
-            <TableHead>Contenu</TableHead>
+            <TableHead>Caption</TableHead>
+            <TableHead>Image générée</TableHead>
             <TableHead>Statut</TableHead>
-            <TableHead>Image</TableHead>
+            <TableHead>Type d'image</TableHead>
             <TableHead>Date de création</TableHead>
+            <TableHead>Type</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {posts.map((post) => (
             <TableRow key={post.id}>
-              <TableCell>
-                <div className="flex gap-1 flex-wrap">
-                  <Badge variant={post.type_post === 'full' ? 'default' : 'secondary'}>
-                    {post.type_post === 'full' ? (
-                      <><FileText className="h-3 w-3 mr-1" /> Post entier</>
-                    ) : (
-                      <><Lightbulb className="h-3 w-3 mr-1" /> Idée clé</>
-                    )}
-                  </Badge>
-                  {post.leadmagnet && (
-                    <Badge variant="default" className="text-xs">
-                      Lead Magnet
-                    </Badge>
-                  )}
-                  {post.keyword && (
-                    <Badge variant="outline" className="text-xs">
-                      CTA: {post.keyword}
-                    </Badge>
-                  )}
-                </div>
-              </TableCell>
               <TableCell className="max-w-md">
-                <p className="truncate text-sm">
-                  {post.contenu && post.contenu.length > 100 
-                    ? `${post.contenu.substring(0, 100)}...` 
-                    : post.contenu || 'Pas de contenu'
+                <p className="text-sm leading-relaxed">
+                  {post.Caption || post.contenu ? 
+                    (post.Caption || post.contenu).length > 100 
+                      ? `${(post.Caption || post.contenu).substring(0, 100)}...` 
+                      : (post.Caption || post.contenu)
+                    : 'Pas de caption'
                   }
                 </p>
+              </TableCell>
+              <TableCell>
+                {post.media ? (
+                  <div className="w-16 h-16">
+                    <img 
+                      src={post.media} 
+                      alt="Image du post" 
+                      className="w-full h-full object-cover rounded border"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = '<div class="w-full h-full bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">Image non disponible</div>';
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">
+                    Pas d'image
+                  </div>
+                )}
               </TableCell>
               <TableCell>
                 <div className="flex gap-1 flex-wrap">
@@ -553,15 +549,28 @@ const PostsTable = ({ posts }: { posts: any[] }) => {
                 <Badge variant="outline">
                   {post.option_image === 'upload' ? (
                     <><Upload className="h-3 w-3 mr-1" /> Upload</>
-                  ) : (
+                  ) : post.option_image === 'ai' ? (
                     <><Sparkles className="h-3 w-3 mr-1" /> IA</>
+                  ) : (
+                    'Non défini'
                   )}
                 </Badge>
               </TableCell>
               <TableCell>
                 <span className="text-sm text-muted-foreground">
-                  {new Date(post.written_created_at || post.added_at || '').toLocaleDateString('fr-FR')}
+                  {new Date(post.written_created_at || post.added_at || post.created_at || '').toLocaleDateString('fr-FR')}
                 </span>
+              </TableCell>
+              <TableCell>
+                <Badge variant={post.type_post === 'full' ? 'default' : 'secondary'}>
+                  {post.type_post === 'full' ? (
+                    <><FileText className="h-3 w-3 mr-1" /> From Scratch</>
+                  ) : post.type_post === 'idea' ? (
+                    <><Lightbulb className="h-3 w-3 mr-1" /> Idée</>
+                  ) : (
+                    'Non défini'
+                  )}
+                </Badge>
               </TableCell>
             </TableRow>
           ))}
