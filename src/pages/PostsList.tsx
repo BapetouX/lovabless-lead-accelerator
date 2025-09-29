@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { ExternalLink, Database, BarChart3, Loader2, Save, FileText, CheckCircle, Clock, Send, Calendar, EyeOff } from "lucide-react";
+import { ExternalLink, Database, BarChart3, Loader2, Save, FileText, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -52,6 +51,7 @@ export default function PostsList() {
       const { data, error } = await supabase
         .from('Posts En Ligne')
         .select('*')
+        .eq('poste', true)
         .order('written_created_at', { ascending: false });
 
       if (error) {
@@ -191,52 +191,6 @@ export default function PostsList() {
     }
   };
 
-  const handlePostAction = async (postId: number, action: 'post' | 'schedule' | 'later') => {
-    try {
-      const post = posts.find(p => p.id === postId);
-      if (!post) return;
-
-      const webhookData = {
-        post_id: postId,
-        action: action,
-        post_data: {
-          content: post.contenu || post.Caption,
-          type_post: post.type_post,
-          leadmagnet: post.leadmagnet,
-          keyword: post.keyword,
-          media: post.media,
-          url_lead_magnet: post.Url_lead_magnet
-        },
-        timestamp: new Date().toISOString(),
-      };
-
-      const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook-waiting/7806/validation-post-from-scratch", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(webhookData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
-      }
-
-      toast({
-        title: "Action envoyée",
-        description: `Action "${action}" envoyée avec succès pour le post ${postId}`,
-      });
-
-    } catch (error) {
-      console.error('Erreur lors de l\'envoi de l\'action:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer l'action au workflow",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -245,9 +199,6 @@ export default function PostsList() {
       </div>
     );
   }
-
-  const postsPosted = posts.filter(post => post.poste === true);
-  const postsNotPosted = posts.filter(post => post.poste !== true);
 
   const PostCard = ({ post }: { post: Post }) => (
     <Card key={post.id} className="group hover:shadow-lg transition-all duration-300 hover-scale">
@@ -262,18 +213,10 @@ export default function PostsList() {
               })()}
             </CardTitle>
             <div className="flex gap-2 shrink-0">
-              {post.poste && (
-                <Badge variant="default" className="text-xs bg-green-500">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Publié
-                </Badge>
-              )}
-              {!post.poste && (
-                <Badge variant="secondary" className="text-xs">
-                  <Clock className="h-3 w-3 mr-1" />
-                  En attente
-                </Badge>
-              )}
+              <Badge variant="default" className="text-xs bg-green-500">
+                <CheckCircle className="h-3 w-3 mr-1" />
+                Publié
+              </Badge>
               {post.leadmagnet && (
                 <Badge variant="default" className="text-xs">
                   Lead Magnet
@@ -290,15 +233,15 @@ export default function PostsList() {
             </div>
           </div>
           
-            <CardDescription className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">
-                {new Date(post.written_created_at).toLocaleDateString('fr-FR', {
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric'
-                })}
-              </span>
-            </CardDescription>
+          <CardDescription className="flex items-center gap-2 text-sm">
+            <span className="text-muted-foreground">
+              {new Date(post.written_created_at).toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+              })}
+            </span>
+          </CardDescription>
         </div>
       </CardHeader>
       
@@ -346,38 +289,6 @@ export default function PostsList() {
               )}
             </div>
           )}
-          
-          {/* Actions de validation du post */}
-          <div className="space-y-3 mb-3">
-            <div className="flex gap-2">
-              <Button 
-                size="sm"
-                onClick={() => handlePostAction(post.id, 'post')}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-              >
-                <Send className="h-4 w-4 mr-1" />
-                Poster
-              </Button>
-              <Button 
-                size="sm"
-                variant="outline"
-                onClick={() => handlePostAction(post.id, 'schedule')}
-                className="flex-1"
-              >
-                <Calendar className="h-4 w-4 mr-1" />
-                Planifié
-              </Button>
-              <Button 
-                size="sm"
-                variant="secondary"
-                onClick={() => handlePostAction(post.id, 'later')}
-                className="flex-1"
-              >
-                <EyeOff className="h-4 w-4 mr-1" />
-                Plus tard
-              </Button>
-            </div>
-          </div>
 
           <div className="flex gap-2">
             <Dialog>
@@ -493,7 +404,7 @@ export default function PostsList() {
                   {post.urn_post_id && (
                     <div>
                       <h4 className="font-medium text-sm text-muted-foreground mb-1">URN Post ID:</h4>
-                      <p className="text-sm bg-muted/50 p-3 rounded-md font-mono">{post.urn_post_id}</p>
+                      <p className="text-xs bg-muted/50 p-3 rounded-md font-mono break-all">{post.urn_post_id}</p>
                     </div>
                   )}
 
@@ -514,26 +425,28 @@ export default function PostsList() {
               </DialogContent>
             </Dialog>
 
-            {!post.table_exist && (
-              <Button 
-                variant="outline" 
+            {!post.table_exist ? (
+              <Button
+                variant="default"
                 size="sm"
                 onClick={() => handleCreateTable(post.id)}
                 className="flex-1"
               >
                 <Database className="h-4 w-4 mr-2" />
-                Créer table
+                Créer une table
               </Button>
-            )}
-
-            {post.table_exist && (
-              <Button 
-                variant="outline" 
+            ) : (
+              <Button
+                variant="outline"
                 size="sm"
-                asChild
                 className="flex-1"
+                asChild
               >
-                <a href={`/competitor-posts?post_id=${post.id}`}>
+                <a 
+                  href={`/post-comments/${post.id}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
                   <BarChart3 className="h-4 w-4 mr-2" />
                   Statistiques
                 </a>
@@ -546,68 +459,41 @@ export default function PostsList() {
   );
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Liste des posts</h1>
-        <p className="text-muted-foreground mt-2">
-          Gérez vos posts LinkedIn et leurs données associées ({posts.length} posts au total)
-        </p>
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold gradient-text">Posts LinkedIn</h1>
+          <p className="text-muted-foreground mt-2">
+            Posts publiés sur LinkedIn
+          </p>
+        </div>
+        <div className="text-right">
+          <div className="text-sm text-muted-foreground">
+            {posts.length} post{posts.length > 1 ? 's' : ''} publié{posts.length > 1 ? 's' : ''}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Actualisé automatiquement
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="not-posted" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="not-posted" className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Posts en attente
-            <Badge variant="secondary">{postsNotPosted.length}</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="posted" className="flex items-center gap-2">
-            <CheckCircle className="h-4 w-4" />
-            Posts publiés
-            <Badge variant="secondary">{postsPosted.length}</Badge>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="not-posted" className="mt-6">
-          {postsNotPosted.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <Clock className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">Aucun post en attente</h3>
-                <p className="text-muted-foreground text-center">
-                  Tous vos posts ont été publiés ou aucun post n'a été créé.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-6 lg:grid-cols-2">
-              {postsNotPosted.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="posted" className="mt-6">
-          {postsPosted.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">Aucun post publié</h3>
-                <p className="text-muted-foreground text-center">
-                  Aucun post n'a encore été publié sur LinkedIn.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-6 lg:grid-cols-2">
-              {postsPosted.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+      <div className="space-y-4">
+        {posts.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <CheckCircle className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Aucun post publié</h3>
+              <p className="text-muted-foreground text-center">
+                Vous n'avez pas encore de posts publiés sur LinkedIn.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4">
+            {posts.map((post) => <PostCard key={post.id} post={post} />)}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
