@@ -258,28 +258,38 @@ export default function PostsList() {
           {post.leadmagnet && (
             <div className="space-y-2">
               <h4 className="text-sm font-medium text-muted-foreground">Lead Magnet URL:</h4>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Coller l'URL du lead magnet..."
-                  value={leadMagnetUrls[post.id] || ''}
-                  onChange={(e) => setLeadMagnetUrls(prev => ({
-                    ...prev,
-                    [post.id]: e.target.value
-                  }))}
-                  className="flex-1"
-                />
-                <Button
-                  size="sm"
-                  onClick={() => handleUpdateLeadMagnet(post.id, leadMagnetUrls[post.id] || '')}
-                  disabled={!leadMagnetUrls[post.id]?.trim()}
-                >
-                  <Save className="h-4 w-4 mr-1" />
-                  OK
-                </Button>
-              </div>
-              {post.Url_lead_magnet && (
-                <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
-                  Actuel: <a href={post.Url_lead_magnet} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">{post.Url_lead_magnet}</a>
+              {!post.Url_lead_magnet ? (
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Coller l'URL du lead magnet..."
+                    value={leadMagnetUrls[post.id] || ''}
+                    onChange={(e) => setLeadMagnetUrls(prev => ({
+                      ...prev,
+                      [post.id]: e.target.value
+                    }))}
+                    className="flex-1"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={() => handleUpdateLeadMagnet(post.id, leadMagnetUrls[post.id] || '')}
+                    disabled={!leadMagnetUrls[post.id]?.trim()}
+                  >
+                    <Save className="h-4 w-4 mr-1" />
+                    OK
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-xs bg-green-50 dark:bg-green-900/20 p-2 rounded border border-green-200 dark:border-green-800">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-green-700 dark:text-green-300 font-medium">Lead magnet configuré</span>
+                  <a 
+                    href={post.Url_lead_magnet} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-primary hover:underline break-all ml-auto"
+                  >
+                    Voir le lien
+                  </a>
                 </div>
               )}
             </div>
@@ -413,15 +423,27 @@ export default function PostsList() {
               </DialogContent>
             </Dialog>
 
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => handleCreateTable(post.id)}
-              className="flex-1"
-            >
-              <Database className="h-4 w-4 mr-2" />
-              Créer une table
-            </Button>
+            {!post.comments_table_name ? (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => handleCreateTable(post.id)}
+                className="flex-1"
+              >
+                <Database className="h-4 w-4 mr-2" />
+                Créer une table
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                disabled
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Table créée
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>
