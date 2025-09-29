@@ -26,6 +26,232 @@ type Post = {
   keyword: string | null;
   written_created_at: string | null;
   added_at: string | null;
+  Caption: string | null;
+  media: string | null;
+  created_at: string | null;
+};
+
+// Composant pour les détails du post avec actions
+const PostDetailsCard = ({ post }: { post: any }) => {
+  const [editedContent, setEditedContent] = useState(post.Caption || post.contenu || "");
+  const { toast } = useToast();
+
+  const handleUpdateContent = async () => {
+    try {
+      const response = await fetch(`https://acfwdjrjtidghrfyzwgz.supabase.co/rest/v1/Posts?id=eq.${post.id}`, {
+        method: "PATCH",
+        headers: {
+          "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI",
+          "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI",
+          "accept-profile": "public",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          Caption: editedContent,
+          contenu: editedContent
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Succès",
+          description: "Contenu mis à jour avec succès",
+        });
+      } else {
+        throw new Error("Erreur lors de la mise à jour");
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le contenu",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePublish = async () => {
+    try {
+      const response = await fetch(`https://acfwdjrjtidghrfyzwgz.supabase.co/rest/v1/Posts?id=eq.${post.id}`, {
+        method: "PATCH",
+        headers: {
+          "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI",
+          "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI",
+          "accept-profile": "public",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          poste: true,
+          brouillon: false
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Succès",
+          description: "Post publié avec succès",
+        });
+      } else {
+        throw new Error("Erreur lors de la publication");
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de publier le post",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSchedule = async () => {
+    try {
+      const response = await fetch(`https://acfwdjrjtidghrfyzwgz.supabase.co/rest/v1/Posts?id=eq.${post.id}`, {
+        method: "PATCH",
+        headers: {
+          "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI",
+          "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI",
+          "accept-profile": "public",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          planifie: true,
+          brouillon: false
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Succès",
+          description: "Post planifié avec succès",
+        });
+      } else {
+        throw new Error("Erreur lors de la planification");
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de planifier le post",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Informations du post */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Informations</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label className="text-sm font-medium text-muted-foreground">ID du post</Label>
+              <p className="text-sm">{post.id}</p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-muted-foreground">Type de post</Label>
+              <div className="mt-1">
+                <Badge variant={post.type_post === "full" ? "default" : "secondary"}>
+                  {post.type_post === "full" ? "Fait main" : "IA"}
+                </Badge>
+              </div>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-muted-foreground">Type d'image</Label>
+              <div className="mt-1">
+                <Badge variant="outline">
+                  {post.option_image === "upload" ? "Upload" : post.option_image === "ai" ? "IA" : "Non défini"}
+                </Badge>
+              </div>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-muted-foreground">Date de création</Label>
+              <p className="text-sm">
+                {new Date(post.written_created_at || post.added_at || post.created_at || "").toLocaleString("fr-FR")}
+              </p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-muted-foreground">Statut</Label>
+              <div className="mt-1 flex gap-1">
+                {post.poste && <Badge className="bg-green-600">Publié</Badge>}
+                {post.brouillon && <Badge variant="secondary">Brouillon</Badge>}
+                {post.planifie && <Badge variant="outline">Planifié</Badge>}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Image du post */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Image</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {post.media ? (
+              <div className="w-full max-w-sm">
+                <img 
+                  src={post.media} 
+                  alt="Image du post" 
+                  className="w-full h-auto rounded border"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = "none";
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = '<div class="w-full h-32 bg-muted rounded border flex items-center justify-center text-muted-foreground">Image non disponible</div>';
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="w-full h-32 bg-muted rounded border flex items-center justify-center text-muted-foreground">
+                Pas d'image
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Contenu éditable */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Contenu du post</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Textarea
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+            rows={8}
+            className="min-h-[200px]"
+            placeholder="Contenu du post..."
+          />
+          <Button onClick={handleUpdateContent} className="w-full">
+            <Save className="h-4 w-4 mr-2" />
+            Sauvegarder les modifications
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-3">
+            <Button onClick={handlePublish} className="flex-1 bg-green-600 hover:bg-green-700">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Publier
+            </Button>
+            <Button onClick={handleSchedule} variant="outline" className="flex-1">
+              <Calendar className="h-4 w-4 mr-2" />
+              Planifier
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 };
 
 export default function Content() {
@@ -474,103 +700,68 @@ const PostsTable = ({ posts }: { posts: any[] }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Caption</TableHead>
-            <TableHead>Image générée</TableHead>
-            <TableHead>Statut</TableHead>
+            <TableHead>Titre</TableHead>
+            <TableHead>Type de post</TableHead>
             <TableHead>Type d'image</TableHead>
             <TableHead>Date de création</TableHead>
-            <TableHead>Type</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {posts.map((post) => (
             <TableRow key={post.id}>
               <TableCell className="max-w-md">
-                <p className="text-sm leading-relaxed">
-                  {post.Caption || post.contenu ? 
-                    (post.Caption || post.contenu).length > 100 
-                      ? `${(post.Caption || post.contenu).substring(0, 100)}...` 
-                      : (post.Caption || post.contenu)
-                    : 'Pas de caption'
-                  }
+                <p className="text-sm font-medium">
+                  {(() => {
+                    const caption = post.Caption || post.contenu || "";
+                    const firstFiveWords = caption.split(" ").slice(0, 5).join(" ");
+                    return firstFiveWords || `Post ${post.id}`;
+                  })()}
                 </p>
               </TableCell>
               <TableCell>
-                {post.media ? (
-                  <div className="w-16 h-16">
-                    <img 
-                      src={post.media} 
-                      alt="Image du post" 
-                      className="w-full h-full object-cover rounded border"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          parent.innerHTML = '<div class="w-full h-full bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">Image non disponible</div>';
-                        }
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="w-16 h-16 bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">
-                    Pas d'image
-                  </div>
-                )}
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-1 flex-wrap">
-                  {post.poste && (
-                    <Badge variant="default" className="text-xs bg-green-600">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Publié
-                    </Badge>
+                <Badge variant={post.type_post === "full" ? "default" : "secondary"}>
+                  {post.type_post === "full" ? (
+                    <><FileText className="h-3 w-3 mr-1" /> Fait main</>
+                  ) : post.type_post === "idea" ? (
+                    <><Sparkles className="h-3 w-3 mr-1" /> IA</>
+                  ) : (
+                    "Non défini"
                   )}
-                  {post.brouillon && (
-                    <Badge variant="secondary" className="text-xs">
-                      <Save className="h-3 w-3 mr-1" />
-                      Brouillon
-                    </Badge>
-                  )}
-                  {post.planifie && (
-                    <Badge variant="outline" className="text-xs">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      Planifié
-                    </Badge>
-                  )}
-                  {!post.poste && !post.brouillon && !post.planifie && (
-                    <Badge variant="secondary" className="text-xs">
-                      En attente
-                    </Badge>
-                  )}
-                </div>
+                </Badge>
               </TableCell>
               <TableCell>
                 <Badge variant="outline">
-                  {post.option_image === 'upload' ? (
+                  {post.option_image === "upload" ? (
                     <><Upload className="h-3 w-3 mr-1" /> Upload</>
-                  ) : post.option_image === 'ai' ? (
+                  ) : post.option_image === "ai" ? (
                     <><Sparkles className="h-3 w-3 mr-1" /> IA</>
                   ) : (
-                    'Non défini'
+                    "Non défini"
                   )}
                 </Badge>
               </TableCell>
               <TableCell>
                 <span className="text-sm text-muted-foreground">
-                  {new Date(post.written_created_at || post.added_at || post.created_at || '').toLocaleDateString('fr-FR')}
+                  {new Date(post.written_created_at || post.added_at || post.created_at || "").toLocaleDateString("fr-FR")}
                 </span>
               </TableCell>
               <TableCell>
-                <Badge variant={post.type_post === 'full' ? 'default' : 'secondary'}>
-                  {post.type_post === 'full' ? (
-                    <><FileText className="h-3 w-3 mr-1" /> From Scratch</>
-                  ) : post.type_post === 'idea' ? (
-                    <><Lightbulb className="h-3 w-3 mr-1" /> Idée</>
-                  ) : (
-                    'Non défini'
-                  )}
-                </Badge>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Eye className="h-4 w-4 mr-1" />
+                      Afficher plus
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Détails du Post</DialogTitle>
+                    </DialogHeader>
+                    
+                    <PostDetailsCard post={post} />
+                  </DialogContent>
+                </Dialog>
               </TableCell>
             </TableRow>
           ))}
