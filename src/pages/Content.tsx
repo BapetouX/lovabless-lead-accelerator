@@ -310,11 +310,52 @@ export default function Content() {
     setIsCreateDialogOpen(false);
     
     try {
+      let imageUrl = null;
+
+      // Si une image a été uploadée, la traiter
+      if (imageOption === "upload") {
+        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+        const file = fileInput?.files?.[0];
+        
+        if (file) {
+          try {
+            // Générer un nom unique pour le fichier
+            const timestamp = new Date().getTime();
+            const fileName = `${timestamp}_${file.name}`;
+            
+            // Upload vers Supabase Storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
+              .from('post-images')
+              .upload(fileName, file);
+
+            if (uploadError) {
+              throw new Error(`Erreur upload: ${uploadError.message}`);
+            }
+
+            // Obtenir l'URL publique
+            const { data: urlData } = supabase.storage
+              .from('post-images')
+              .getPublicUrl(fileName);
+
+            imageUrl = urlData.publicUrl;
+            console.log("Image uploadée avec succès:", imageUrl);
+          } catch (uploadError) {
+            console.error("Erreur lors de l'upload d'image:", uploadError);
+            toast({
+              title: "Erreur d'upload",
+              description: "Impossible d'uploader l'image. Le post sera créé sans image.",
+              variant: "destructive",
+            });
+          }
+        }
+      }
+
       const webhookData = {
         type_post: postType,
         contenu: postType === "full" ? postContent : keyIdea,
         option_image: imageOption,
         prompt_image: imageOption === "ai" ? imagePrompt : null,
+        image_url: imageUrl, // Ajouter l'URL de l'image si elle existe
         has_cta: hasCTA,
         cta_keyword: hasCTA ? ctaKeyword : null,
         save_as: saveAsType,

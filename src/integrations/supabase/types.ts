@@ -232,28 +232,25 @@ export type Database = {
       post_creation: {
         Row: {
           caption: string | null
-          created_at: string
           id: number
+          prompt_image: string | null
           statut: string | null
-          updated_at: string
           url_media: string | null
           written_created_at: string | null
         }
         Insert: {
           caption?: string | null
-          created_at?: string
           id?: number
+          prompt_image?: string | null
           statut?: string | null
-          updated_at?: string
           url_media?: string | null
           written_created_at?: string | null
         }
         Update: {
           caption?: string | null
-          created_at?: string
           id?: number
+          prompt_image?: string | null
           statut?: string | null
-          updated_at?: string
           url_media?: string | null
           written_created_at?: string | null
         }
