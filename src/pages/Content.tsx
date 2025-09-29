@@ -71,7 +71,7 @@ const PostDetailsCard = ({ post }: { post: any }) => {
 
   const handlePublish = async () => {
     try {
-      const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook-test/planification-et-post", {
+      const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook/planification-et-post", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -104,7 +104,7 @@ const PostDetailsCard = ({ post }: { post: any }) => {
 
   const handleSchedule = async () => {
     try {
-      const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook-test/planification-et-post", {
+      const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook/planification-et-post", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
