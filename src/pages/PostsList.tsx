@@ -209,7 +209,7 @@ export default function PostsList() {
               })()}
             </CardTitle>
             <div className="flex gap-2 shrink-0">
-              {post.Url_lead_magnet && post.keyword && (
+              {post.Url_lead_magnet && post.keyword && post.comments_table_name && (
                 <Badge variant="default" className="text-xs">
                   Lead Magnet
                 </Badge>
