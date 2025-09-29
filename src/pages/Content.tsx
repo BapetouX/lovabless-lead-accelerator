@@ -732,9 +732,9 @@ const PostsTable = ({ posts }: { posts: any[] }) => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Media</TableHead>
             <TableHead>Titre</TableHead>
-            <TableHead>Type de post</TableHead>
-            <TableHead>Type d'image</TableHead>
+            <TableHead>Statut</TableHead>
             <TableHead>Date de création</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -742,6 +742,29 @@ const PostsTable = ({ posts }: { posts: any[] }) => {
         <TableBody>
           {posts.map((post) => (
             <TableRow key={post.id}>
+              <TableCell>
+                {post.media ? (
+                  <div className="w-16 h-16 overflow-hidden rounded-lg">
+                    <img 
+                      src={post.media} 
+                      alt="Aperçu du post" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = "none";
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = '<div class="w-full h-full bg-muted rounded flex items-center justify-center"><span class="text-xs text-muted-foreground">Pas d\'image</span></div>';
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+                    <Image className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                )}
+              </TableCell>
               <TableCell className="max-w-md">
                 <p className="text-sm font-medium">
                   {(() => {
@@ -752,26 +775,11 @@ const PostsTable = ({ posts }: { posts: any[] }) => {
                 </p>
               </TableCell>
               <TableCell>
-                <Badge variant={post.type_post === "full" ? "default" : "secondary"}>
-                  {post.type_post === "full" ? (
-                    <><FileText className="h-3 w-3 mr-1" /> Fait main</>
-                  ) : post.type_post === "idea" ? (
-                    <><Sparkles className="h-3 w-3 mr-1" /> IA</>
-                  ) : (
-                    "Non défini"
-                  )}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Badge variant="outline">
-                  {post.option_image === "upload" ? (
-                    <><Upload className="h-3 w-3 mr-1" /> Upload</>
-                  ) : post.option_image === "ai" ? (
-                    <><Sparkles className="h-3 w-3 mr-1" /> IA</>
-                  ) : (
-                    "Non défini"
-                  )}
-                </Badge>
+                <div className="flex gap-1">
+                  {post.poste && <Badge className="bg-green-600">Publié</Badge>}
+                  {post.brouillon && <Badge variant="secondary">Brouillon</Badge>}
+                  {post.planifie && <Badge variant="outline">Planifié</Badge>}
+                </div>
               </TableCell>
               <TableCell>
                 <span className="text-sm text-muted-foreground">
