@@ -555,8 +555,7 @@ export default function Content() {
                        disabled={
                          isSubmitting ||
                          (postType === "idea" && !keyIdea.trim()) ||
-                         (imageOption === "upload" && !(document.querySelector('input[type="file"]') as HTMLInputElement)?.files?.[0]) ||
-                         (imageOption === "ai" && !imagePrompt.trim())
+                         (imageOption === "upload" && !(document.querySelector('input[type="file"]') as HTMLInputElement)?.files?.[0])
                        }
                      >
                        {isSubmitting ? "Envoi en cours..." : "Créer le post"}
