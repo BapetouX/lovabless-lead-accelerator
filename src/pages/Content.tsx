@@ -463,21 +463,8 @@ export default function Content() {
 
                   {/* Lead Magnet */}
                   <div className="space-y-3">
-                    <Label className="text-base font-semibold">Options du post</Label>
+                    <Label className="text-base font-semibold">CTA / Lead magnet</Label>
                     <div className="space-y-2">
-                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-border">
-                        <input
-                          type="checkbox"
-                          id="leadmagnet"
-                          checked={isLeadMagnet}
-                          onChange={(e) => setIsLeadMagnet(e.target.checked)}
-                          className="rounded"
-                        />
-                        <Label htmlFor="leadmagnet" className="cursor-pointer">
-                          Ce post contient un lead magnet
-                        </Label>
-                      </div>
-                      
                       <div className="flex items-center space-x-2 p-3 rounded-lg border border-border">
                         <input
                           type="checkbox"

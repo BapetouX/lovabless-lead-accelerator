@@ -13,7 +13,7 @@ type Post = {
   id: number;
   Post_id: number | null;
   Caption: string | null;
-  created_at: string;
+  written_created_at: string;
   table_exist?: boolean | null;
   keyword?: string | null;
   post_url?: string | null;
@@ -50,9 +50,9 @@ export default function PostsList() {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('Posts')
+        .from('Posts En Ligne')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('written_created_at', { ascending: false });
 
       if (error) {
         console.error('Erreur lors de la récupération des posts:', error);
@@ -109,7 +109,7 @@ export default function PostsList() {
 
       // Mettre à jour le post avec table_exist = true et le nom de la table
       const { error: updateError } = await supabase
-        .from('Posts')
+        .from('Posts En Ligne')
         .update({ 
           table_exist: true,
           comments_table_name: result.table_name 
@@ -150,7 +150,7 @@ export default function PostsList() {
   const handleUpdateLeadMagnet = async (postId: number, url: string) => {
     try {
       const { error } = await supabase
-        .from('Posts')
+        .from('Posts En Ligne')
         .update({ Url_lead_magnet: url } as any)
         .eq('id', postId);
 
@@ -290,15 +290,15 @@ export default function PostsList() {
             </div>
           </div>
           
-          <CardDescription className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">
-              {new Date(post.created_at).toLocaleDateString('fr-FR', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
-              })}
-            </span>
-          </CardDescription>
+            <CardDescription className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">
+                {new Date(post.written_created_at).toLocaleDateString('fr-FR', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric'
+                })}
+              </span>
+            </CardDescription>
         </div>
       </CardHeader>
       
@@ -400,7 +400,7 @@ export default function PostsList() {
                   <div>
                     <h4 className="font-medium text-sm text-muted-foreground mb-1">Date de création:</h4>
                     <p className="text-sm">
-                      {new Date(post.created_at).toLocaleDateString('fr-FR', {
+                      {new Date(post.written_created_at).toLocaleDateString('fr-FR', {
                         day: 'numeric',
                         month: 'long',
                         year: 'numeric',

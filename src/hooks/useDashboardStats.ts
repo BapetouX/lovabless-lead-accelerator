@@ -7,7 +7,7 @@ export const useDashboardStats = () => {
     queryFn: async () => {
       // Get published posts count
       const { count: publishedPosts } = await supabase
-        .from("Posts")
+        .from("Posts En Ligne")
         .select("*", { count: "exact", head: true })
         .eq("poste", true);
 
@@ -25,7 +25,7 @@ export const useDashboardStats = () => {
       const currentMonth = new Date();
       currentMonth.setDate(1);
       const { count: postsThisMonth } = await supabase
-        .from("Posts")
+        .from("Posts En Ligne")
         .select("*", { count: "exact", head: true })
         .eq("poste", true)
         .gte("created_at", currentMonth.toISOString());

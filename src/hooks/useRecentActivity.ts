@@ -9,17 +9,17 @@ export const useRecentActivity = () => {
 
       // Get recent published posts
       const { data: recentPosts } = await supabase
-        .from("Posts")
-        .select("created_at, contenu")
+        .from("Posts En Ligne")
+        .select("written_created_at, Caption")
         .eq("poste", true)
-        .order("created_at", { ascending: false })
+        .order("written_created_at", { ascending: false })
         .limit(2);
 
       if (recentPosts) {
         recentPosts.forEach((post) => {
           activities.push({
             action: "Nouveau post publié",
-            time: formatTimeAgo(post.created_at),
+            time: formatTimeAgo(post.written_created_at),
             type: "post",
           });
         });
