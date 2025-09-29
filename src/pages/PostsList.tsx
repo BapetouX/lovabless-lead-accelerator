@@ -19,7 +19,6 @@ type Post = {
   media?: string | null;
   urn_post_id?: string | null;
   Url_lead_magnet?: string | null;
-  poste?: boolean | null;
   leadmagnet?: boolean | null;
   type_post?: string | null;
   comments_table_name?: string | null;
@@ -210,17 +209,9 @@ export default function PostsList() {
               })()}
             </CardTitle>
             <div className="flex gap-2 shrink-0">
-              {post.poste && (
-                <Badge variant="default" className="text-xs bg-green-500">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Publié
-                </Badge>
-              )}
-              {!post.poste && (
-                <Badge variant="secondary" className="text-xs">
-                  Brouillon
-                </Badge>
-              )}
+              <Badge variant="secondary" className="text-xs">
+                Brouillon
+              </Badge>
               {post.leadmagnet && (
                 <Badge variant="default" className="text-xs">
                   Lead Magnet
