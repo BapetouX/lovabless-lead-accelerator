@@ -229,12 +229,42 @@ export type Database = {
         }
         Relationships: []
       }
-      Posts: {
+      post_creation: {
         Row: {
+          caption: string | null
+          created_at: string
+          id: number
+          statut: string | null
+          updated_at: string
+          url_media: string | null
+          written_created_at: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: number
+          statut?: string | null
+          updated_at?: string
+          url_media?: string | null
+          written_created_at?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: number
+          statut?: string | null
+          updated_at?: string
+          url_media?: string | null
+          written_created_at?: string | null
+        }
+        Relationships: []
+      }
+      "Posts En Ligne": {
+        Row: {
+          added_at: string | null
+          brouillon: boolean | null
           Caption: string | null
           comments_table_name: string | null
-          contenu: string | null
-          created_at: string
           id: number
           keyword: string | null
           leadmagnet: boolean | null
@@ -244,16 +274,18 @@ export type Database = {
           post_url: string | null
           poste: boolean | null
           prompt_image: string | null
+          Statut: string | null
           table_exist: boolean | null
           type_post: string | null
           Url_lead_magnet: string | null
           urn_post_id: string | null
+          written_created_at: string | null
         }
         Insert: {
+          added_at?: string | null
+          brouillon?: boolean | null
           Caption?: string | null
           comments_table_name?: string | null
-          contenu?: string | null
-          created_at: string
           id?: number
           keyword?: string | null
           leadmagnet?: boolean | null
@@ -263,16 +295,18 @@ export type Database = {
           post_url?: string | null
           poste?: boolean | null
           prompt_image?: string | null
+          Statut?: string | null
           table_exist?: boolean | null
           type_post?: string | null
           Url_lead_magnet?: string | null
           urn_post_id?: string | null
+          written_created_at?: string | null
         }
         Update: {
+          added_at?: string | null
+          brouillon?: boolean | null
           Caption?: string | null
           comments_table_name?: string | null
-          contenu?: string | null
-          created_at?: string
           id?: number
           keyword?: string | null
           leadmagnet?: boolean | null
@@ -282,10 +316,12 @@ export type Database = {
           post_url?: string | null
           poste?: boolean | null
           prompt_image?: string | null
+          Statut?: string | null
           table_exist?: boolean | null
           type_post?: string | null
           Url_lead_magnet?: string | null
           urn_post_id?: string | null
+          written_created_at?: string | null
         }
         Relationships: []
       }
