@@ -9,7 +9,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PenTool, Calendar, Clock, Lightbulb, FileText, Image, Sparkles, Upload, Type, Eye, CheckCircle, Save } from "lucide-react";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { PenTool, Calendar, Clock, Lightbulb, FileText, Image, Sparkles, Upload, Type, Eye, CheckCircle, Save, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -34,6 +39,9 @@ type Post = {
 // Composant pour les détails du post avec actions
 const PostDetailsCard = ({ post }: { post: any }) => {
   const [editedContent, setEditedContent] = useState(post.Caption || post.contenu || "");
+  const [scheduleDate, setScheduleDate] = useState<Date>();
+  const [scheduleTime, setScheduleTime] = useState("12:00");
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const handleUpdateContent = async () => {
@@ -137,11 +145,26 @@ const PostDetailsCard = ({ post }: { post: any }) => {
   };
 
   const handleSchedule = async () => {
+    if (!scheduleDate) {
+      toast({
+        title: "Date requise",
+        description: "Veuillez sélectionner une date et heure",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      // Combiner date et heure
+      const [hours, minutes] = scheduleTime.split(':');
+      const scheduledDateTime = new Date(scheduleDate);
+      scheduledDateTime.setHours(parseInt(hours), parseInt(minutes));
+
       console.log("📅 Début de la planification du post:", {
         post_id: post.id,
         content_length: editedContent.length,
-        media: post.media
+        media: post.media,
+        scheduled_for: scheduledDateTime.toISOString()
       });
 
       const requestData = {
@@ -149,6 +172,7 @@ const PostDetailsCard = ({ post }: { post: any }) => {
         post_id: post.id,
         content: editedContent,
         media: post.media,
+        scheduled_for: scheduledDateTime.toISOString(),
         timestamp: new Date().toISOString()
       };
 
@@ -172,9 +196,10 @@ const PostDetailsCard = ({ post }: { post: any }) => {
         const responseData = await response.json().catch(() => ({}));
         console.log("✅ Réponse JSON:", responseData);
         
+        setIsScheduleDialogOpen(false);
         toast({
           title: "Succès",
-          description: "Post planifié avec succès",
+          description: `Post planifié pour le ${format(scheduledDateTime, "dd/MM/yyyy 'à' HH:mm", { locale: fr })}`,
         });
       } else {
         const errorText = await response.text().catch(() => 'Erreur inconnue');
@@ -311,10 +336,98 @@ const PostDetailsCard = ({ post }: { post: any }) => {
               <CheckCircle className="h-4 w-4 mr-2" />
               Publier
             </Button>
-            <Button onClick={handleSchedule} variant="outline" className="flex-1">
-              <Calendar className="h-4 w-4 mr-2" />
-              Planifier
-            </Button>
+            
+            <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="flex-1">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Planifier
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Planifier la publication</DialogTitle>
+                  <DialogDescription>
+                    Choisissez la date et l'heure de publication
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4">
+                  {/* Sélecteur de date */}
+                  <div className="space-y-2">
+                    <Label>Date de publication</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !scheduleDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {scheduleDate ? format(scheduleDate, "dd/MM/yyyy", { locale: fr }) : "Sélectionner une date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={scheduleDate}
+                          onSelect={setScheduleDate}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  {/* Sélecteur d'heure */}
+                  <div className="space-y-2">
+                    <Label>Heure de publication</Label>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="time"
+                        value={scheduleTime}
+                        onChange={(e) => setScheduleTime(e.target.value)}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Aperçu */}
+                  {scheduleDate && (
+                    <div className="p-3 bg-muted rounded-lg">
+                      <p className="text-sm text-muted-foreground">
+                        Publication programmée pour le{" "}
+                        <span className="font-medium text-foreground">
+                          {format(scheduleDate, "dd/MM/yyyy", { locale: fr })} à {scheduleTime}
+                        </span>
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsScheduleDialogOpen(false)}
+                      className="flex-1"
+                    >
+                      Annuler
+                    </Button>
+                    <Button
+                      onClick={handleSchedule}
+                      disabled={!scheduleDate}
+                      className="flex-1"
+                    >
+                      Planifier
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </CardContent>
       </Card>
