@@ -8,8 +8,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { PenTool, Calendar, Clock, Lightbulb, FileText, Image, Sparkles, Upload, Type, Eye } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PenTool, Calendar, Clock, Lightbulb, FileText, Image, Sparkles, Upload, Type, Eye, CheckCircle, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Content() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -24,6 +26,8 @@ export default function Content() {
   const [isLeadMagnet, setIsLeadMagnet] = useState(false);
   const [hasCTA, setHasCTA] = useState(false);
   const [ctaKeyword, setCtaKeyword] = useState("");
+  const [saveAsType, setSaveAsType] = useState("publish"); // publish, draft, schedule
+  const { toast } = useToast();
 
   // Fetch created posts from Posts table
   const fetchCreatedPosts = async () => {
@@ -32,7 +36,7 @@ export default function Content() {
         .from('Posts')
         .select('*')
         .not('contenu', 'is', null)
-        .order('created_at', { ascending: false });
+        .order('written_created_at', { ascending: false });
 
       if (error) throw error;
       setCreatedPosts(data || []);
@@ -58,6 +62,7 @@ export default function Content() {
         prompt_image: imageOption === "ai" ? imagePrompt : null,
         has_cta: hasCTA,
         cta_keyword: hasCTA ? ctaKeyword : null,
+        save_as: saveAsType,
         timestamp: new Date().toISOString(),
       };
 
@@ -78,12 +83,14 @@ export default function Content() {
       const result = await response.json();
       console.log("Réponse du webhook:", result);
 
-      // Save to Posts table
+      // Save to Posts table with proper status based on saveAsType
       const { error: dbError } = await supabase
         .from('Posts')
         .insert({
           contenu: postType === "full" ? postContent : keyIdea,
-          poste: false,
+          poste: saveAsType === "publish",
+          brouillon: saveAsType === "draft",
+          planifie: saveAsType === "schedule",
           leadmagnet: isLeadMagnet,
           type_post: postType,
           option_image: imageOption,
@@ -93,6 +100,16 @@ export default function Content() {
 
       if (dbError) {
         console.error('Erreur lors de la sauvegarde:', dbError);
+        toast({
+          title: "Erreur",
+          description: "Erreur lors de la sauvegarde en base de données",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Succès",
+          description: `Post ${saveAsType === "draft" ? "sauvé en brouillon" : saveAsType === "schedule" ? "planifié" : "créé"} avec succès`,
+        });
       }
 
       // Refresh posts list
@@ -107,11 +124,16 @@ export default function Content() {
       setIsLeadMagnet(false);
       setHasCTA(false);
       setCtaKeyword("");
+      setSaveAsType("publish");
       setIsCreateDialogOpen(false);
       
     } catch (error) {
       console.error("Erreur lors de l'envoi vers le webhook:", error);
-      // Vous pouvez ajouter un toast d'erreur ici si vous le souhaitez
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de l'envoi vers le webhook",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -126,7 +148,7 @@ export default function Content() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -292,6 +314,40 @@ export default function Content() {
                     )}
                   </div>
 
+                  {/* Type de sauvegarde */}
+                  <div className="space-y-3">
+                    <Label className="text-base font-semibold">Action après création</Label>
+                    <RadioGroup value={saveAsType} onValueChange={setSaveAsType}>
+                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-secondary/50">
+                        <RadioGroupItem value="publish" id="publish" />
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <Label htmlFor="publish" className="cursor-pointer">
+                            Publier directement
+                          </Label>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-secondary/50">
+                        <RadioGroupItem value="draft" id="draft" />
+                        <div className="flex items-center gap-2">
+                          <Save className="h-4 w-4 text-primary" />
+                          <Label htmlFor="draft" className="cursor-pointer">
+                            Sauvegarder en brouillon
+                          </Label>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-secondary/50">
+                        <RadioGroupItem value="schedule" id="schedule" />
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-primary" />
+                          <Label htmlFor="schedule" className="cursor-pointer">
+                            Planifier pour plus tard
+                          </Label>
+                        </div>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
                   {/* Actions */}
                   <div className="flex gap-3 pt-4">
                     <Button
@@ -312,7 +368,11 @@ export default function Content() {
                         (hasCTA && !ctaKeyword.trim())
                       }
                     >
-                      {isSubmitting ? "Envoi en cours..." : "Créer le post"}
+                      {isSubmitting ? "Envoi en cours..." : 
+                        saveAsType === "draft" ? "Sauvegarder en brouillon" :
+                        saveAsType === "schedule" ? "Planifier le post" :
+                        "Créer le post"
+                      }
                     </Button>
                   </div>
                 </div>
@@ -320,39 +380,9 @@ export default function Content() {
             </Dialog>
           </CardContent>
         </Card>
-
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-primary" />
-              Planifier
-            </CardTitle>
-            <CardDescription>Programmer vos publications</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Planifier
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-primary" />
-              Brouillons
-            </CardTitle>
-            <CardDescription>Vos posts en attente</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Voir brouillons
-            </Button>
-          </CardContent>
-        </Card>
       </div>
 
-      {/* Table des posts créés */}
+      {/* Posts créés avec onglets */}
       <Card className="shadow-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -360,7 +390,7 @@ export default function Content() {
             Mes posts créés
           </CardTitle>
           <CardDescription>
-            Tous vos posts créés et envoyés vers le webhook
+            Tous vos posts avec filtrage par statut
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -377,94 +407,153 @@ export default function Content() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Contenu</TableHead>
-                    <TableHead>Image</TableHead>
-                    <TableHead>Date de création</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {createdPosts.map((post) => (
-                    <TableRow key={post.id}>
-                      <TableCell>
-                        <div className="flex gap-1 flex-wrap">
-                          <Badge variant={post.type_post === 'full' ? 'default' : 'secondary'}>
-                            {post.type_post === 'full' ? (
-                              <><FileText className="h-3 w-3 mr-1" /> Post entier</>
-                            ) : (
-                              <><Lightbulb className="h-3 w-3 mr-1" /> Idée clé</>
-                            )}
-                          </Badge>
-                          {post.leadmagnet && (
-                            <Badge variant="default" className="text-xs">
-                              Lead Magnet
-                            </Badge>
-                          )}
-                          {post.poste && (
-                            <Badge variant="secondary" className="text-xs">
-                              Posté
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="max-w-md">
-                        <p className="truncate text-sm">
-                          {post.contenu.length > 100 
-                            ? `${post.contenu.substring(0, 100)}...` 
-                            : post.contenu
-                          }
-                        </p>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {post.option_image === 'upload' ? (
-                            <><Upload className="h-3 w-3 mr-1" /> Upload</>
-                          ) : (
-                            <><Sparkles className="h-3 w-3 mr-1" /> IA</>
-                          )}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {new Date(post.created_at).toLocaleDateString('fr-FR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            <Tabs defaultValue="all" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="all" className="flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  Tous
+                  <Badge variant="secondary">{createdPosts.length}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="drafts" className="flex items-center gap-2">
+                  <Save className="h-4 w-4" />
+                  Brouillons
+                  <Badge variant="secondary">{createdPosts.filter(p => p.brouillon).length}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="scheduled" className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Planifiés
+                  <Badge variant="secondary">{createdPosts.filter(p => p.planifie).length}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="published" className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4" />
+                  Publiés
+                  <Badge variant="secondary">{createdPosts.filter(p => p.poste).length}</Badge>
+                </TabsTrigger>
+              </TabsList>
 
-      <Card className="shadow-card bg-gradient-subtle">
-        <CardContent className="p-8 text-center">
-          <div className="flex justify-center gap-4 mb-6">
-            <div className="p-3 rounded-full bg-primary/10">
-              <FileText className="h-8 w-8 text-primary" />
-            </div>
-            <div className="p-3 rounded-full bg-primary/10">
-              <Lightbulb className="h-8 w-8 text-primary" />
-            </div>
-            <div className="p-3 rounded-full bg-primary/10">
-              <Sparkles className="h-8 w-8 text-primary" />
-            </div>
-          </div>
-          <h3 className="text-xl font-semibold mb-2">Créez du contenu engageant</h3>
-          <p className="text-muted-foreground">
-            Rédigez des posts complets ou partagez vos idées clés. Ajoutez des images personnalisées ou générées par IA.
-          </p>
+              <TabsContent value="all" className="mt-6">
+                <PostsTable posts={createdPosts} />
+              </TabsContent>
+
+              <TabsContent value="drafts" className="mt-6">
+                <PostsTable posts={createdPosts.filter(p => p.brouillon)} />
+              </TabsContent>
+
+              <TabsContent value="scheduled" className="mt-6">
+                <PostsTable posts={createdPosts.filter(p => p.planifie)} />
+              </TabsContent>
+
+              <TabsContent value="published" className="mt-6">
+                <PostsTable posts={createdPosts.filter(p => p.poste)} />
+              </TabsContent>
+            </Tabs>
+          )}
         </CardContent>
       </Card>
     </div>
   );
 }
+
+// Composant pour afficher la table des posts
+const PostsTable = ({ posts }: { posts: any[] }) => {
+  if (posts.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <p className="text-muted-foreground">Aucun post dans cette catégorie</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Type</TableHead>
+            <TableHead>Contenu</TableHead>
+            <TableHead>Statut</TableHead>
+            <TableHead>Image</TableHead>
+            <TableHead>Date de création</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {posts.map((post) => (
+            <TableRow key={post.id}>
+              <TableCell>
+                <div className="flex gap-1 flex-wrap">
+                  <Badge variant={post.type_post === 'full' ? 'default' : 'secondary'}>
+                    {post.type_post === 'full' ? (
+                      <><FileText className="h-3 w-3 mr-1" /> Post entier</>
+                    ) : (
+                      <><Lightbulb className="h-3 w-3 mr-1" /> Idée clé</>
+                    )}
+                  </Badge>
+                  {post.leadmagnet && (
+                    <Badge variant="default" className="text-xs">
+                      Lead Magnet
+                    </Badge>
+                  )}
+                  {post.keyword && (
+                    <Badge variant="outline" className="text-xs">
+                      CTA: {post.keyword}
+                    </Badge>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="max-w-md">
+                <p className="truncate text-sm">
+                  {post.contenu && post.contenu.length > 100 
+                    ? `${post.contenu.substring(0, 100)}...` 
+                    : post.contenu || 'Pas de contenu'
+                  }
+                </p>
+              </TableCell>
+              <TableCell>
+                <div className="flex gap-1 flex-wrap">
+                  {post.poste && (
+                    <Badge variant="default" className="text-xs bg-green-600">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Publié
+                    </Badge>
+                  )}
+                  {post.brouillon && (
+                    <Badge variant="secondary" className="text-xs">
+                      <Save className="h-3 w-3 mr-1" />
+                      Brouillon
+                    </Badge>
+                  )}
+                  {post.planifie && (
+                    <Badge variant="outline" className="text-xs">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      Planifié
+                    </Badge>
+                  )}
+                  {!post.poste && !post.brouillon && !post.planifie && (
+                    <Badge variant="secondary" className="text-xs">
+                      En attente
+                    </Badge>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline">
+                  {post.option_image === 'upload' ? (
+                    <><Upload className="h-3 w-3 mr-1" /> Upload</>
+                  ) : (
+                    <><Sparkles className="h-3 w-3 mr-1" /> IA</>
+                  )}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <span className="text-sm text-muted-foreground">
+                  {new Date(post.written_created_at || post.added_at).toLocaleDateString('fr-FR')}
+                </span>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};
