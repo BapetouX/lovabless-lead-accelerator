@@ -51,7 +51,6 @@ export default function PostsList() {
       const { data, error } = await supabase
         .from('Posts En Ligne')
         .select('*')
-        .eq('poste', true)
         .order('written_created_at', { ascending: false });
 
       if (error) {
@@ -213,10 +212,17 @@ export default function PostsList() {
               })()}
             </CardTitle>
             <div className="flex gap-2 shrink-0">
-              <Badge variant="default" className="text-xs bg-green-500">
-                <CheckCircle className="h-3 w-3 mr-1" />
-                Publié
-              </Badge>
+              {post.poste && (
+                <Badge variant="default" className="text-xs bg-green-500">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Publié
+                </Badge>
+              )}
+              {!post.poste && (
+                <Badge variant="secondary" className="text-xs">
+                  Brouillon
+                </Badge>
+              )}
               {post.leadmagnet && (
                 <Badge variant="default" className="text-xs">
                   Lead Magnet
@@ -464,12 +470,12 @@ export default function PostsList() {
         <div>
           <h1 className="text-3xl font-bold gradient-text">Posts LinkedIn</h1>
           <p className="text-muted-foreground mt-2">
-            Posts publiés sur LinkedIn
+            Tous les posts de la base de données
           </p>
         </div>
         <div className="text-right">
           <div className="text-sm text-muted-foreground">
-            {posts.length} post{posts.length > 1 ? 's' : ''} publié{posts.length > 1 ? 's' : ''}
+            {posts.length} post{posts.length > 1 ? 's' : ''} trouvé{posts.length > 1 ? 's' : ''}
           </div>
           <div className="text-xs text-muted-foreground">
             Actualisé automatiquement
@@ -482,9 +488,9 @@ export default function PostsList() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
               <CheckCircle className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Aucun post publié</h3>
+              <h3 className="text-lg font-semibold mb-2">Aucun post trouvé</h3>
               <p className="text-muted-foreground text-center">
-                Vous n'avez pas encore de posts publiés sur LinkedIn.
+                Aucun post n'a été trouvé dans la base de données.
               </p>
             </CardContent>
           </Card>
