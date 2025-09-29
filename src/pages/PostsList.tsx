@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { ExternalLink, Database, BarChart3, Loader2, Save, FileText, CheckCircle, Clock } from "lucide-react";
+import { ExternalLink, Database, BarChart3, Loader2, Save, FileText, CheckCircle, Clock, Send, Calendar, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -191,6 +191,52 @@ export default function PostsList() {
     }
   };
 
+  const handlePostAction = async (postId: number, action: 'post' | 'schedule' | 'later') => {
+    try {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      const webhookData = {
+        post_id: postId,
+        action: action,
+        post_data: {
+          content: post.contenu || post.Caption,
+          type_post: post.type_post,
+          leadmagnet: post.leadmagnet,
+          keyword: post.keyword,
+          media: post.media,
+          url_lead_magnet: post.Url_lead_magnet
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook-waiting/7806/validation-post-from-scratch", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(webhookData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      toast({
+        title: "Action envoyée",
+        description: `Action "${action}" envoyée avec succès pour le post ${postId}`,
+      });
+
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi de l\'action:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer l'action au workflow",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -301,6 +347,38 @@ export default function PostsList() {
             </div>
           )}
           
+          {/* Actions de validation du post */}
+          <div className="space-y-3 mb-3">
+            <div className="flex gap-2">
+              <Button 
+                size="sm"
+                onClick={() => handlePostAction(post.id, 'post')}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Send className="h-4 w-4 mr-1" />
+                Poster
+              </Button>
+              <Button 
+                size="sm"
+                variant="outline"
+                onClick={() => handlePostAction(post.id, 'schedule')}
+                className="flex-1"
+              >
+                <Calendar className="h-4 w-4 mr-1" />
+                Planifié
+              </Button>
+              <Button 
+                size="sm"
+                variant="secondary"
+                onClick={() => handlePostAction(post.id, 'later')}
+                className="flex-1"
+              >
+                <EyeOff className="h-4 w-4 mr-1" />
+                Plus tard
+              </Button>
+            </div>
+          </div>
+
           <div className="flex gap-2">
             <Dialog>
               <DialogTrigger asChild>

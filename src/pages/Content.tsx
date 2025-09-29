@@ -63,7 +63,7 @@ export default function Content() {
 
       console.log("Envoi vers webhook:", webhookData);
 
-      const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook/creation-contenu", {
+      const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook-waiting/7806/validation-post-from-scratch", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
