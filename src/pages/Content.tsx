@@ -196,12 +196,6 @@ const PostDetailsCard = ({ post }: { post: any }) => {
         const responseData = await response.json().catch(() => ({}));
         console.log("✅ Réponse JSON:", responseData);
         
-        // Fermer la popup après envoi réussi
-        setIsScheduleDialogOpen(false);
-        // Réinitialiser les champs
-        setScheduleDate(undefined);
-        setScheduleTime("12:00");
-        
         toast({
           title: "Succès",
           description: `Post planifié pour le ${format(scheduledDateTime, "dd/MM/yyyy 'à' HH:mm", { locale: fr })}`,
@@ -230,6 +224,11 @@ const PostDetailsCard = ({ post }: { post: any }) => {
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      // Fermer la popup et réinitialiser les champs même en cas d'erreur
+      setIsScheduleDialogOpen(false);
+      setScheduleDate(undefined);
+      setScheduleTime("12:00");
     }
   };
 
