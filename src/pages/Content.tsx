@@ -267,7 +267,7 @@ export default function Content() {
   const [isLeadMagnet, setIsLeadMagnet] = useState(false);
   const [hasCTA, setHasCTA] = useState(false);
   const [ctaKeyword, setCtaKeyword] = useState("");
-  const [saveAsType, setSaveAsType] = useState("publish"); // publish, draft, schedule
+  const [saveAsType, setSaveAsType] = useState("draft"); // Always draft by default
   const { toast } = useToast();
 
   // Fetch created posts from Posts table (uniquement les brouillons)
@@ -340,7 +340,7 @@ export default function Content() {
 
       toast({
         title: "Post envoyé",
-        description: `Post ${saveAsType === "draft" ? "sauvé en brouillon" : saveAsType === "schedule" ? "planifié" : "créé"} et envoyé au workflow`,
+        description: "Post sauvé en brouillon et envoyé au workflow",
       });
 
       // Réinitialiser le formulaire
@@ -541,7 +541,7 @@ export default function Content() {
 
                     {imageOption === "ai" && (
                       <div className="mt-3">
-                        <Label>Description de l'image à générer</Label>
+                        <Label>Description de l'image à générer (optionnel)</Label>
                         <Textarea
                           placeholder="Décrivez l'image que vous souhaitez générer (ex: 'Une photo moderne d'un bureau avec un ordinateur portable')"
                           value={imagePrompt}
@@ -551,43 +551,9 @@ export default function Content() {
                         />
                       </div>
                     )}
-                  </div>
+                   </div>
 
-                  {/* Type de sauvegarde */}
-                  <div className="space-y-3">
-                    <Label className="text-base font-semibold">Action après création</Label>
-                    <RadioGroup value={saveAsType} onValueChange={setSaveAsType}>
-                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-secondary/50">
-                        <RadioGroupItem value="publish" id="publish" />
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                          <Label htmlFor="publish" className="cursor-pointer">
-                            Publier directement
-                          </Label>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-secondary/50">
-                        <RadioGroupItem value="draft" id="draft" />
-                        <div className="flex items-center gap-2">
-                          <Save className="h-4 w-4 text-primary" />
-                          <Label htmlFor="draft" className="cursor-pointer">
-                            Sauvegarder en brouillon
-                          </Label>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-secondary/50">
-                        <RadioGroupItem value="schedule" id="schedule" />
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-primary" />
-                          <Label htmlFor="schedule" className="cursor-pointer">
-                            Planifier pour plus tard
-                          </Label>
-                        </div>
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  {/* Actions */}
+                   {/* Actions */}
                   <div className="flex gap-3 pt-4">
                     <Button
                       variant="outline"
@@ -606,13 +572,9 @@ export default function Content() {
                         (imageOption === "ai" && !imagePrompt.trim()) ||
                         (hasCTA && !ctaKeyword.trim())
                       }
-                    >
-                      {isSubmitting ? "Envoi en cours..." : 
-                        saveAsType === "draft" ? "Sauvegarder en brouillon" :
-                        saveAsType === "schedule" ? "Planifier le post" :
-                        "Créer le post"
-                      }
-                    </Button>
+                     >
+                       {isSubmitting ? "Envoi en cours..." : "Sauvegarder en brouillon"}
+                     </Button>
                   </div>
                 </div>
               </DialogContent>
