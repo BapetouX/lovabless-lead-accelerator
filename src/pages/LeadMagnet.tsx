@@ -137,7 +137,7 @@ export default function LeadMagnet() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card className="shadow-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -170,6 +170,34 @@ export default function LeadMagnet() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
+                <p className="text-sm text-muted-foreground">DM envoyés</p>
+                <p className="text-2xl font-bold text-green-600">{totalReceivedDM}</p>
+              </div>
+              <div className="h-12 w-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
+                <MessageCircle className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Demandes connexion</p>
+                <p className="text-2xl font-bold text-blue-600">{totalConnectionRequests}</p>
+              </div>
+              <div className="h-12 w-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
                 <p className="text-sm text-muted-foreground">Leads totaux</p>
                 <p className="text-2xl font-bold text-foreground">{totalLeads}</p>
               </div>
@@ -184,20 +212,6 @@ export default function LeadMagnet() {
             >
               Voir tous les leads
             </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-card cursor-pointer" onClick={() => navigate('/competitors')}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Voir tous les leads</p>
-                <p className="text-sm font-medium text-primary">Accéder →</p>
-              </div>
-              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <ExternalLink className="h-6 w-6 text-primary" />
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
@@ -280,31 +294,6 @@ export default function LeadMagnet() {
         </CardContent>
       </Card>
 
-      {/* Summary */}
-      {posts.length > 0 && (
-        <Card className="shadow-card bg-gradient-to-r from-primary/5 to-secondary/5">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold text-foreground">{totalComments}</p>
-                <p className="text-sm text-muted-foreground">Total commentaires</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-green-600">{totalReceivedDM}</p>
-                <p className="text-sm text-muted-foreground">DM envoyés</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-blue-600">{totalConnectionRequests}</p>
-                <p className="text-sm text-muted-foreground">Demandes de connexion</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-orange-600">{totalComments - totalReceivedDM}</p>
-                <p className="text-sm text-muted-foreground">Sans DM</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
