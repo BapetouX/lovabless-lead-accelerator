@@ -321,7 +321,12 @@ export default function Content() {
           try {
             // Générer un nom unique pour le fichier
             const timestamp = new Date().getTime();
-            const fileName = `${timestamp}_${file.name}`;
+            // Nettoyer le nom de fichier (supprimer espaces et caractères spéciaux)
+            const cleanFileName = file.name
+              .replace(/[^a-zA-Z0-9.\-_]/g, '_')  // Remplacer caractères spéciaux par _
+              .replace(/_+/g, '_')                // Supprimer underscores multiples
+              .replace(/^_|_$/g, '');            // Supprimer underscores début/fin
+            const fileName = `${timestamp}_${cleanFileName}`;
             
             // Upload vers Supabase Storage
             const { data: uploadData, error: uploadError } = await supabase.storage
