@@ -209,10 +209,7 @@ export default function PostsList() {
               })()}
             </CardTitle>
             <div className="flex gap-2 shrink-0">
-              <Badge variant="secondary" className="text-xs">
-                Brouillon
-              </Badge>
-              {post.leadmagnet && (
+              {post.Url_lead_magnet && post.keyword && (
                 <Badge variant="default" className="text-xs">
                   Lead Magnet
                 </Badge>
@@ -222,9 +219,6 @@ export default function PostsList() {
                   CTA: {post.keyword}
                 </Badge>
               )}
-              <Badge variant="outline" className="text-xs">
-                #{post.Post_id || post.id}
-              </Badge>
             </div>
           </div>
           
@@ -332,6 +326,11 @@ export default function PostsList() {
                       <p className="text-sm leading-relaxed bg-muted/50 p-3 rounded-md whitespace-pre-wrap">{post.Caption}</p>
                     </div>
                   )}
+
+                  <div>
+                    <h4 className="font-medium text-sm text-muted-foreground mb-1">ID du post:</h4>
+                    <p className="text-sm bg-muted/50 p-3 rounded-md">#{post.Post_id || post.id}</p>
+                  </div>
 
                   {post.media && (
                     <div>
