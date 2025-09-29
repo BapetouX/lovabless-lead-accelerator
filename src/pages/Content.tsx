@@ -13,6 +13,21 @@ import { PenTool, Calendar, Clock, Lightbulb, FileText, Image, Sparkles, Upload,
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+type Post = {
+  id: number;
+  contenu: string | null;
+  brouillon: boolean | null;
+  planifie: boolean | null;
+  poste: boolean | null;
+  leadmagnet: boolean | null;
+  type_post: string | null;
+  option_image: string | null;
+  prompt_image: string | null;
+  keyword: string | null;
+  written_created_at: string | null;
+  added_at: string | null;
+};
+
 export default function Content() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [postType, setPostType] = useState("full");
@@ -21,7 +36,7 @@ export default function Content() {
   const [keyIdea, setKeyIdea] = useState("");
   const [imagePrompt, setImagePrompt] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [createdPosts, setCreatedPosts] = useState([]);
+  const [createdPosts, setCreatedPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLeadMagnet, setIsLeadMagnet] = useState(false);
   const [hasCTA, setHasCTA] = useState(false);
@@ -29,18 +44,30 @@ export default function Content() {
   const [saveAsType, setSaveAsType] = useState("publish"); // publish, draft, schedule
   const { toast } = useToast();
 
-  // Fetch created posts from Posts table
+  // Fetch created posts from Posts table (uniquement les brouillons)
   const fetchCreatedPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('Posts')
-        .select('*')
-        .order('written_created_at', { ascending: false });
-
-      if (error) throw error;
-      setCreatedPosts(data || []);
+      setIsLoading(true);
+      
+      // Utiliser fetch direct pour éviter les problèmes de types TypeScript complexes
+      const response = await fetch(`https://acfwdjrjtidghrfyzwgz.supabase.co/rest/v1/Posts?brouillon=eq.true&order=written_created_at.desc&select=*`, {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI',
+          'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI',
+          'accept-profile': 'public'
+        }
+      });
+      
+      if (response.ok) {
+        const posts = await response.json();
+        setCreatedPosts(Array.isArray(posts) ? posts : []);
+      } else {
+        console.error('Erreur lors de la récupération:', response.status);
+        setCreatedPosts([]);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des posts:', error);
+      setCreatedPosts([]);
     } finally {
       setIsLoading(false);
     }
@@ -376,7 +403,7 @@ export default function Content() {
             Mes posts créés
           </CardTitle>
           <CardDescription>
-            Tous vos posts avec filtrage par statut
+            Tous vos posts avec filtrage par statut (uniquement les brouillons)
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -387,7 +414,7 @@ export default function Content() {
           ) : createdPosts.length === 0 ? (
             <div className="text-center py-8">
               <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Aucun post créé pour le moment</p>
+              <p className="text-muted-foreground">Aucun brouillon pour le moment</p>
               <p className="text-sm text-muted-foreground">
                 Commencez par créer votre premier post ci-dessus
               </p>
@@ -397,7 +424,7 @@ export default function Content() {
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="all" className="flex items-center gap-2">
                   <Eye className="h-4 w-4" />
-                  Tous
+                  Tous les brouillons
                   <Badge variant="secondary">{createdPosts.length}</Badge>
                 </TabsTrigger>
                 <TabsTrigger value="drafts" className="flex items-center gap-2">
@@ -533,7 +560,7 @@ const PostsTable = ({ posts }: { posts: any[] }) => {
               </TableCell>
               <TableCell>
                 <span className="text-sm text-muted-foreground">
-                  {new Date(post.written_created_at || post.added_at).toLocaleDateString('fr-FR')}
+                  {new Date(post.written_created_at || post.added_at || '').toLocaleDateString('fr-FR')}
                 </span>
               </TableCell>
             </TableRow>
