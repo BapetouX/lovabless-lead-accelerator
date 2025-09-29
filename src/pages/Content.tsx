@@ -71,17 +71,17 @@ const PostDetailsCard = ({ post }: { post: any }) => {
 
   const handlePublish = async () => {
     try {
-      const response = await fetch(`https://acfwdjrjtidghrfyzwgz.supabase.co/rest/v1/Posts?id=eq.${post.id}`, {
-        method: "PATCH",
+      const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook-test/planification-et-post", {
+        method: "POST",
         headers: {
-          "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI",
-          "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI",
-          "accept-profile": "public",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          poste: true,
-          brouillon: false
+          action: "publish",
+          post_id: post.id,
+          content: editedContent,
+          media: post.media,
+          timestamp: new Date().toISOString()
         })
       });
 
@@ -104,17 +104,17 @@ const PostDetailsCard = ({ post }: { post: any }) => {
 
   const handleSchedule = async () => {
     try {
-      const response = await fetch(`https://acfwdjrjtidghrfyzwgz.supabase.co/rest/v1/Posts?id=eq.${post.id}`, {
-        method: "PATCH",
+      const response = await fetch("https://n8n.srv802543.hstgr.cloud/webhook-test/planification-et-post", {
+        method: "POST",
         headers: {
-          "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI",
-          "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI",
-          "accept-profile": "public",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          planifie: true,
-          brouillon: false
+          action: "schedule",
+          post_id: post.id,
+          content: editedContent,
+          media: post.media,
+          timestamp: new Date().toISOString()
         })
       });
 
