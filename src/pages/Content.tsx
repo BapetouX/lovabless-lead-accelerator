@@ -549,18 +549,17 @@ export default function Content() {
                     >
                       Annuler
                     </Button>
-                    <Button
-                      onClick={handleCreatePost}
-                      className="flex-1 bg-gradient-primary"
-                      disabled={
-                        isSubmitting ||
-                        (postType === "full" && !postContent.trim()) ||
-                        (postType === "idea" && !keyIdea.trim()) ||
-                        (imageOption === "ai" && !imagePrompt.trim()) ||
-                        (hasCTA && !ctaKeyword.trim())
-                      }
+                     <Button
+                       onClick={handleCreatePost}
+                       className="flex-1 bg-gradient-primary"
+                       disabled={
+                         isSubmitting ||
+                         (postType === "idea" && !keyIdea.trim()) ||
+                         (imageOption === "upload" && !(document.querySelector('input[type="file"]') as HTMLInputElement)?.files?.[0]) ||
+                         (imageOption === "ai" && !imagePrompt.trim())
+                       }
                      >
-                       {isSubmitting ? "Envoi en cours..." : "Sauvegarder en brouillon"}
+                       {isSubmitting ? "Envoi en cours..." : "Créer le post"}
                      </Button>
                   </div>
                 </div>
