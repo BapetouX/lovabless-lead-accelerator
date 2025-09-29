@@ -270,13 +270,22 @@ export default function Content() {
   const [saveAsType, setSaveAsType] = useState("draft"); // Always draft by default
   const { toast } = useToast();
 
-  // Fetch created posts from Posts table (uniquement les brouillons)
+  // Fetch created posts from all tables (Posts et post_creation)
   const fetchCreatedPosts = async () => {
     try {
       setIsLoading(true);
       
-      // Utiliser fetch direct pour éviter les problèmes de types TypeScript complexes
-      const response = await fetch(`https://acfwdjrjtidghrfyzwgz.supabase.co/rest/v1/Posts?brouillon=eq.true&order=written_created_at.desc&select=*`, {
+      // Récupérer d'abord les posts de la table Posts En Ligne
+      const postsResponse = await fetch(`https://acfwdjrjtidghrfyzwgz.supabase.co/rest/v1/Posts%20En%20Ligne?order=added_at.desc&select=*`, {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI',
+          'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI',
+          'accept-profile': 'public'
+        }
+      });
+
+      // Récupérer ensuite les posts de la table post_creation
+      const creationResponse = await fetch(`https://acfwdjrjtidghrfyzwgz.supabase.co/rest/v1/post_creation?order=written_created_at.desc&select=*`, {
         headers: {
           'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI',
           'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjZndkanJqdGlkZ2hyZnl6d2d6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1MzM0MDYsImV4cCI6MjA3NDEwOTQwNn0.cClC4_xaT_hhcwkpgGQ7n8QMVRI3vJRk1vbydVXcNLI',
@@ -284,13 +293,43 @@ export default function Content() {
         }
       });
       
-      if (response.ok) {
-        const posts = await response.json();
-        setCreatedPosts(Array.isArray(posts) ? posts : []);
-      } else {
-        console.error('Erreur lors de la récupération:', response.status);
-        setCreatedPosts([]);
+      let allPosts = [];
+      
+      // Traiter les posts de Posts En Ligne
+      if (postsResponse.ok) {
+        const postsData = await postsResponse.json();
+        if (Array.isArray(postsData)) {
+          allPosts = [...allPosts, ...postsData];
+        }
       }
+      
+      // Traiter les posts de post_creation
+      if (creationResponse.ok) {
+        const creationData = await creationResponse.json();
+        if (Array.isArray(creationData)) {
+          // Adapter les champs de post_creation au format attendu
+          const adaptedCreationPosts = creationData.map(post => ({
+            ...post,
+            Caption: post.caption,
+            media: post.url_media,
+            added_at: post.written_created_at,
+            type_post: 'creation',
+            brouillon: post.statut === 'brouillon' || !post.statut,
+            planifie: post.statut === 'planifié',
+            poste: post.statut === 'publié'
+          }));
+          allPosts = [...allPosts, ...adaptedCreationPosts];
+        }
+      }
+      
+      // Trier tous les posts par date (plus récent en premier)
+      allPosts.sort((a, b) => {
+        const dateA = new Date(a.added_at || a.written_created_at || a.created_at || 0);
+        const dateB = new Date(b.added_at || b.written_created_at || b.created_at || 0);
+        return dateB.getTime() - dateA.getTime();
+      });
+      
+      setCreatedPosts(allPosts);
     } catch (error) {
       console.error('Erreur lors du chargement des posts:', error);
       setCreatedPosts([]);
@@ -622,7 +661,7 @@ export default function Content() {
             Mes posts créés
           </CardTitle>
           <CardDescription>
-            Tous vos posts avec filtrage par statut (uniquement les brouillons)
+            Tous vos posts créés avec filtrage par statut
           </CardDescription>
         </CardHeader>
         <CardContent>
