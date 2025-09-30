@@ -249,8 +249,8 @@ export default function PostsList() {
             </div>
           )}
 
-          {/* Section Lead Magnet - uniquement si leadmagnet = true */}
-          {post.leadmagnet && (
+          {/* Section Lead Magnet - affichée si une table de commentaires existe */}
+          {post.comments_table_name && (
             <div className="space-y-2">
               <h4 className="text-sm font-medium text-muted-foreground">Lead Magnet URL:</h4>
               {!post.Url_lead_magnet ? (
