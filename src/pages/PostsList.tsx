@@ -108,7 +108,8 @@ export default function PostsList() {
         .from('Posts En Ligne')
         .update({ 
           table_exist: true,
-          comments_table_name: result.table_name 
+          comments_table_name: result.table_name,
+          leadmagnet: true
         })
         .eq('id', postId);
 
@@ -125,7 +126,7 @@ export default function PostsList() {
       // Mettre à jour l'état local
       setPosts(posts.map(post => 
         post.id === postId 
-          ? { ...post, table_exist: true }
+          ? { ...post, table_exist: true, leadmagnet: true }
           : post
       ));
 
