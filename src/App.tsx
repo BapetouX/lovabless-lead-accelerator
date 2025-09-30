@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Objectives from "./pages/Objectives";
 import LeadMagnet from "./pages/LeadMagnet";
 import Content from "./pages/Content";
 import PostsList from "./pages/PostsList";
@@ -37,6 +38,7 @@ const App = () => {
             <Route path="/competitor-posts/:competitorId" element={<CompetitorPosts />} />
             <Route path="/" element={<DashboardLayout />}>
               <Route path="dashboard" element={<Dashboard />} />
+              <Route path="objectives" element={<Objectives />} />
               <Route path="content-watch" element={<ContentWatch />} />
               <Route path="competitors" element={<Competitors />} />
               <Route path="content" element={<Content />} />

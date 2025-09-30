@@ -12,7 +12,8 @@ import {
   Eye,
   List,
   FileText,
-  TrendingUp
+  TrendingUp,
+  Target
 } from "lucide-react";
 import { useState } from "react";
 import { Logo } from "@/components/ui/logo";
@@ -22,6 +23,11 @@ const navigation = [
     name: "Dashboard", 
     href: "/dashboard", 
     icon: LayoutDashboard 
+  },
+  { 
+    name: "Objectifs", 
+    href: "/objectives", 
+    icon: Target 
   },
   {
     name: "Création de contenu",
