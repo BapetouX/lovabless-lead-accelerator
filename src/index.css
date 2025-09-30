@@ -2,108 +2,108 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tech Accelerator Design System - Modern Tech Dark Theme */
+/* LinkedIn Accelerator Design System - Light Rose & Blue Theme */
 
 @layer base {
   :root {
-    --background: 222 47% 3%;
-    --foreground: 0 0% 98%;
+    --background: 0 0% 100%;
+    --foreground: 230 15% 15%;
 
-    --card: 222 47% 6%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 230 15% 15%;
 
-    --popover: 222 47% 6%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 230 15% 15%;
 
-    /* Electric Cyan Primary */
-    --primary: 191 100% 50%;
-    --primary-foreground: 222 47% 3%;
-    --primary-light: 191 100% 85%;
-    --primary-dark: 191 100% 35%;
+    /* Rose Primary */
+    --primary: 330 81% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 330 81% 95%;
+    --primary-dark: 330 81% 45%;
 
-    /* Tech Grays */
-    --secondary: 222 47% 11%;
-    --secondary-foreground: 0 0% 98%;
+    /* Light Grays */
+    --secondary: 330 20% 97%;
+    --secondary-foreground: 230 15% 15%;
 
-    --muted: 222 47% 11%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 330 20% 96%;
+    --muted-foreground: 230 15% 45%;
 
-    --accent: 191 100% 15%;
-    --accent-foreground: 191 100% 50%;
+    --accent: 330 81% 96%;
+    --accent-foreground: 330 81% 60%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 222 47% 15%;
-    --input: 222 47% 11%;
-    --ring: 191 100% 50%;
+    --border: 330 20% 90%;
+    --input: 330 20% 95%;
+    --ring: 330 81% 60%;
 
-    --radius: 0.25rem;
+    --radius: 0.5rem;
 
-    /* Tech Design Tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(191 100% 50%), hsl(271 91% 65%));
-    --gradient-tech: linear-gradient(45deg, hsl(191 100% 50% / 0.1), hsl(271 91% 65% / 0.1));
-    --gradient-subtle: linear-gradient(180deg, hsl(222 47% 3%), hsl(222 47% 6%));
-    --shadow-glow: 0 0 20px hsl(191 100% 50% / 0.3);
-    --shadow-glow-hover: 0 0 30px hsl(191 100% 50% / 0.5);
-    --shadow-card: 0 4px 20px hsl(222 47% 1% / 0.5);
+    /* Rose & Blue Design Tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(330 81% 60%), hsl(240 100% 70%));
+    --gradient-tech: linear-gradient(45deg, hsl(330 81% 60% / 0.1), hsl(240 100% 70% / 0.1));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(330 20% 98%));
+    --shadow-glow: 0 0 20px hsl(330 81% 60% / 0.2);
+    --shadow-glow-hover: 0 0 30px hsl(330 81% 60% / 0.4);
+    --shadow-card: 0 4px 20px hsl(330 81% 60% / 0.08);
     --transition-tech: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* Neon Green Accent */
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 98%;
+    /* Blue Accent */
+    --success: 240 100% 60%;
+    --success-foreground: 0 0% 100%;
 
     /* Purple Tech Accent */
-    --tech-purple: 271 91% 65%;
-    --tech-purple-foreground: 0 0% 98%;
+    --tech-purple: 240 100% 70%;
+    --tech-purple-foreground: 0 0% 100%;
 
-    --sidebar-background: 222 47% 4%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 191 100% 50%;
-    --sidebar-primary-foreground: 222 47% 3%;
-    --sidebar-accent: 222 47% 8%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 222 47% 12%;
-    --sidebar-ring: 191 100% 50%;
+    --sidebar-background: 330 20% 98%;
+    --sidebar-foreground: 230 15% 25%;
+    --sidebar-primary: 330 81% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 330 20% 95%;
+    --sidebar-accent-foreground: 230 15% 15%;
+    --sidebar-border: 330 20% 88%;
+    --sidebar-ring: 330 81% 60%;
   }
 
   .dark {
-    /* Tech theme uses same colors for consistency */
-    --background: 222 47% 2%;
-    --foreground: 0 0% 100%;
+    /* Optional dark mode - keep light as default */
+    --background: 230 15% 8%;
+    --foreground: 0 0% 95%;
 
-    --card: 222 47% 4%;
-    --card-foreground: 0 0% 100%;
+    --card: 230 15% 10%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 222 47% 4%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 230 15% 10%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 191 100% 55%;
-    --primary-foreground: 222 47% 2%;
+    --primary: 330 81% 65%;
+    --primary-foreground: 230 15% 8%;
 
-    --secondary: 222 47% 8%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 230 15% 15%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 222 47% 8%;
+    --muted: 230 15% 15%;
     --muted-foreground: 0 0% 70%;
 
-    --accent: 191 100% 12%;
-    --accent-foreground: 191 100% 55%;
+    --accent: 330 81% 20%;
+    --accent-foreground: 330 81% 65%;
 
     --destructive: 0 84% 65%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 0 0% 95%;
 
-    --border: 222 47% 12%;
-    --input: 222 47% 8%;
-    --ring: 191 100% 55%;
-    --sidebar-background: 222 47% 2%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 191 100% 55%;
-    --sidebar-primary-foreground: 222 47% 2%;
-    --sidebar-accent: 222 47% 6%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 222 47% 10%;
-    --sidebar-ring: 191 100% 55%;
+    --border: 230 15% 20%;
+    --input: 230 15% 15%;
+    --ring: 330 81% 65%;
+    --sidebar-background: 230 15% 6%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 330 81% 65%;
+    --sidebar-primary-foreground: 230 15% 6%;
+    --sidebar-accent: 230 15% 12%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 230 15% 18%;
+    --sidebar-ring: 330 81% 65%;
   }
 }
 

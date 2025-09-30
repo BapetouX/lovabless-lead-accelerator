@@ -69,14 +69,31 @@ export function Sidebar() {
       {/* Header */}
       <div className="p-6 border-b border-border">
         <div className="flex items-center justify-between">
-          <Logo collapsed={collapsed} />
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded-sm hover:bg-secondary transition-all duration-300 hover:shadow-glow ml-auto"
-          >
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </button>
+          {!collapsed ? (
+            <Logo collapsed={collapsed} />
+          ) : (
+            <div className="flex justify-center w-full">
+              <Logo collapsed={collapsed} />
+            </div>
+          )}
+          {!collapsed && (
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-1.5 rounded-sm hover:bg-secondary transition-all duration-300 hover:shadow-glow ml-auto"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+          )}
         </div>
+        {/* Bouton pour rouvrir la sidebar quand elle est fermée */}
+        {collapsed && (
+          <button
+            onClick={() => setCollapsed(false)}
+            className="absolute top-4 -right-3 p-1.5 rounded-full bg-card border border-border hover:bg-secondary transition-all duration-300 hover:shadow-glow z-10"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
