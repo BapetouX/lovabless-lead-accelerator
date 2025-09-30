@@ -59,6 +59,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        "tech-purple": {
+          DEFAULT: "hsl(var(--tech-purple))",
+          foreground: "hsl(var(--tech-purple-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -90,12 +98,17 @@ export default {
         "slide-up": "slide-up 0.4s ease-out",
       },
       boxShadow: {
-        'soft': 'var(--shadow-soft)',
+        'glow': 'var(--shadow-glow)',
+        'glow-hover': 'var(--shadow-glow-hover)',
         'card': 'var(--shadow-card)',
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
+        'gradient-tech': 'var(--gradient-tech)',
         'gradient-subtle': 'var(--gradient-subtle)',
+      },
+      transitionTimingFunction: {
+        'tech': 'var(--transition-tech)',
       },
     },
   },
