@@ -673,7 +673,7 @@ export default function Content() {
                   Créer un post
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Créer un nouveau post</DialogTitle>
                   <DialogDescription>
