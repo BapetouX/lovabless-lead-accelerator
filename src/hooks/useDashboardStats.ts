@@ -8,8 +8,7 @@ export const useDashboardStats = () => {
       // Get published posts count
       const { count: publishedPosts } = await supabase
         .from("Posts En Ligne")
-        .select("*", { count: "exact", head: true })
-        .eq("poste", true);
+        .select("*", { count: "exact", head: true });
 
       // Get total leads count
       const { count: totalLeads } = await supabase
@@ -27,8 +26,7 @@ export const useDashboardStats = () => {
       const { count: postsThisMonth } = await supabase
         .from("Posts En Ligne")
         .select("*", { count: "exact", head: true })
-        .eq("poste", true)
-        .gte("created_at", currentMonth.toISOString());
+        .gte("added_at", currentMonth.toISOString());
 
       // Get leads from this month
       const { count: leadsThisMonth } = await supabase

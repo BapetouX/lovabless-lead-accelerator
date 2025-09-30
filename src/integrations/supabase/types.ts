@@ -234,7 +234,7 @@ export type Database = {
           comment_date: string | null
           connection_request_statut: boolean | null
           created_at: string
-          id_comment_primary: string | null
+          id_comment_primary: string
           linkedin_id: string | null
           linkedin_title: string | null
           linkedin_url: string | null
@@ -245,7 +245,7 @@ export type Database = {
           comment_date?: string | null
           connection_request_statut?: boolean | null
           created_at?: string
-          id_comment_primary?: string | null
+          id_comment_primary?: string
           linkedin_id?: string | null
           linkedin_title?: string | null
           linkedin_url?: string | null
@@ -256,7 +256,7 @@ export type Database = {
           comment_date?: string | null
           connection_request_statut?: boolean | null
           created_at?: string
-          id_comment_primary?: string | null
+          id_comment_primary?: string
           linkedin_id?: string | null
           linkedin_title?: string | null
           linkedin_url?: string | null
