@@ -15,6 +15,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import { useState } from "react";
+import { Logo } from "@/components/ui/logo";
 
 const navigation = [
   { 
@@ -68,12 +69,10 @@ export function Sidebar() {
       {/* Header */}
       <div className="p-6 border-b border-border">
         <div className="flex items-center justify-between">
-          {!collapsed && (
-            <h1 className="text-xl font-bold text-primary">LinkedIn Accelerator</h1>
-          )}
+          <Logo collapsed={collapsed} />
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded-lg hover:bg-secondary transition-colors"
+            className="p-1.5 rounded-sm hover:bg-secondary transition-all duration-300 hover:shadow-glow ml-auto"
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
@@ -148,8 +147,9 @@ export function Sidebar() {
       {/* Footer */}
       {!collapsed && (
         <div className="p-4 border-t border-border">
-          <div className="text-xs text-muted-foreground">
-            LinkedIn Accelerator v1.0
+          <div className="text-xs text-muted-foreground flex items-center gap-1">
+            <span>LinkedIn Accelerator</span>
+            <span className="text-primary">v1.0</span>
           </div>
         </div>
       )}

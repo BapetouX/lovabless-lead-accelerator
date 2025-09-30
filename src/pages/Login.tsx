@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Linkedin } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -20,12 +20,11 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-soft">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center">
-            <Linkedin className="h-6 w-6 text-white" />
+        <CardHeader className="text-center space-y-6">
+          <div className="flex justify-center">
+            <Logo className="scale-125" />
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold">LinkedIn Accelerator</CardTitle>
             <CardDescription className="text-muted-foreground">
               Connectez-vous pour booster votre présence LinkedIn
             </CardDescription>
