@@ -5,18 +5,15 @@ import { Label } from "@/components/ui/label";
 import { Target, TrendingUp, Users, Edit } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useObjectives } from "@/hooks/useObjectives";
 
 export default function Objectives() {
-  const [objectives, setObjectives] = useState({
-    postsPerMonth: 25,
-    leadsPerMonth: 50,
-    competitorsToTrack: 10,
-  });
-
+  const { objectives, updateObjectives } = useObjectives();
+  const [localObjectives, setLocalObjectives] = useState(objectives);
   const [isEditing, setIsEditing] = useState(false);
 
   const handleSaveObjectives = () => {
-    // Ici on pourrait sauvegarder dans la base de données
+    updateObjectives(localObjectives);
     toast.success("Objectifs mis à jour avec succès");
     setIsEditing(false);
   };
@@ -89,10 +86,10 @@ export default function Objectives() {
                   <Input
                     id={objective.key}
                     type="number"
-                    value={objectives[objective.key as keyof typeof objectives]}
+                    value={localObjectives[objective.key as keyof typeof localObjectives]}
                     onChange={(e) =>
-                      setObjectives({
-                        ...objectives,
+                      setLocalObjectives({
+                        ...localObjectives,
                         [objective.key]: parseInt(e.target.value) || 0,
                       })
                     }

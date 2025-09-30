@@ -2,10 +2,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { TrendingUp, Users, Target } from "lucide-react";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useRecentActivity } from "@/hooks/useRecentActivity";
+import { useObjectives } from "@/hooks/useObjectives";
 
 export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: recentActivity, isLoading: activityLoading } = useRecentActivity();
+  const { objectives } = useObjectives();
 
   const statsCards = [
     {
@@ -122,14 +124,14 @@ export default function Dashboard() {
                   { 
                     goal: "Posts à publier", 
                     current: stats?.postsThisMonth || 0, 
-                    target: 25, 
-                    percentage: Math.min(((stats?.postsThisMonth || 0) / 25) * 100, 100) 
+                    target: objectives.postsPerMonth, 
+                    percentage: Math.min(((stats?.postsThisMonth || 0) / objectives.postsPerMonth) * 100, 100) 
                   },
                   { 
                     goal: "Leads à générer", 
                     current: stats?.leadsThisMonth || 0, 
-                    target: 50, 
-                    percentage: Math.min(((stats?.leadsThisMonth || 0) / 50) * 100, 100) 
+                    target: objectives.leadsPerMonth, 
+                    percentage: Math.min(((stats?.leadsThisMonth || 0) / objectives.leadsPerMonth) * 100, 100) 
                   },
                 ].map((goal, index) => (
                   <div key={index} className="space-y-2">
