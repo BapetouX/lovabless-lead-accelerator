@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Users, MessageCircle, Target, Eye, Heart } from "lucide-react";
+import { TrendingUp, Users, Target } from "lucide-react";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useRecentActivity } from "@/hooks/useRecentActivity";
 
@@ -16,10 +16,10 @@ export default function Dashboard() {
       color: "text-primary",
     },
     {
-      title: "Taux d'engagement",
-      value: statsLoading ? "..." : `${stats?.engagementRate || 0}%`,
-      change: "Moyenne concurrents",
-      icon: Heart,
+      title: "Concurrents suivis",
+      value: statsLoading ? "..." : stats?.competitorsCount.toString() || "0",
+      change: "Analyse continue",
+      icon: Users,
       color: "text-primary",
     },
     {
@@ -27,13 +27,6 @@ export default function Dashboard() {
       value: statsLoading ? "..." : stats?.totalLeads.toString() || "0",
       change: `+${stats?.leadsThisMonth || 0} ce mois`,
       icon: Target,
-      color: "text-primary",
-    },
-    {
-      title: "Concurrents suivis",
-      value: statsLoading ? "..." : stats?.competitorsCount.toString() || "0",
-      change: "Analyse continue",
-      icon: Users,
       color: "text-primary",
     },
   ];
@@ -48,7 +41,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {statsCards.map((stat) => (
           <Card key={stat.title} className="shadow-card">
             <CardContent className="p-6">
@@ -137,12 +130,6 @@ export default function Dashboard() {
                     current: stats?.leadsThisMonth || 0, 
                     target: 50, 
                     percentage: Math.min(((stats?.leadsThisMonth || 0) / 50) * 100, 100) 
-                  },
-                  { 
-                    goal: "Engagement rate", 
-                    current: parseFloat(stats?.engagementRate || "0"), 
-                    target: 100, 
-                    percentage: Math.min(parseFloat(stats?.engagementRate || "0"), 100) 
                   },
                 ].map((goal, index) => (
                   <div key={index} className="space-y-2">
