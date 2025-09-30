@@ -229,6 +229,42 @@ export type Database = {
         }
         Relationships: []
       }
+      post_comments_5: {
+        Row: {
+          comment_date: string | null
+          connection_request_statut: boolean | null
+          created_at: string
+          id_comment_primary: string | null
+          linkedin_id: string | null
+          linkedin_title: string | null
+          linkedin_url: string | null
+          person_name: string | null
+          received_dm: boolean | null
+        }
+        Insert: {
+          comment_date?: string | null
+          connection_request_statut?: boolean | null
+          created_at?: string
+          id_comment_primary?: string | null
+          linkedin_id?: string | null
+          linkedin_title?: string | null
+          linkedin_url?: string | null
+          person_name?: string | null
+          received_dm?: boolean | null
+        }
+        Update: {
+          comment_date?: string | null
+          connection_request_statut?: boolean | null
+          created_at?: string
+          id_comment_primary?: string | null
+          linkedin_id?: string | null
+          linkedin_title?: string | null
+          linkedin_url?: string | null
+          person_name?: string | null
+          received_dm?: boolean | null
+        }
+        Relationships: []
+      }
       post_creation: {
         Row: {
           caption: string | null
@@ -259,66 +295,48 @@ export type Database = {
       "Posts En Ligne": {
         Row: {
           added_at: string | null
-          brouillon: boolean | null
           Caption: string | null
           comments_table_name: string | null
           id: number
           keyword: string | null
           leadmagnet: boolean | null
           media: string | null
-          option_image: string | null
           Post_id: number | null
           post_url: string | null
-          poste: boolean | null
-          prompt_image: string | null
-          Statut: string | null
           table_exist: boolean | null
           type_post: string | null
           Url_lead_magnet: string | null
           urn_post_id: string | null
-          written_created_at: string | null
         }
         Insert: {
           added_at?: string | null
-          brouillon?: boolean | null
           Caption?: string | null
           comments_table_name?: string | null
           id?: number
           keyword?: string | null
           leadmagnet?: boolean | null
           media?: string | null
-          option_image?: string | null
           Post_id?: number | null
           post_url?: string | null
-          poste?: boolean | null
-          prompt_image?: string | null
-          Statut?: string | null
           table_exist?: boolean | null
           type_post?: string | null
           Url_lead_magnet?: string | null
           urn_post_id?: string | null
-          written_created_at?: string | null
         }
         Update: {
           added_at?: string | null
-          brouillon?: boolean | null
           Caption?: string | null
           comments_table_name?: string | null
           id?: number
           keyword?: string | null
           leadmagnet?: boolean | null
           media?: string | null
-          option_image?: string | null
           Post_id?: number | null
           post_url?: string | null
-          poste?: boolean | null
-          prompt_image?: string | null
-          Statut?: string | null
           table_exist?: boolean | null
           type_post?: string | null
           Url_lead_magnet?: string | null
           urn_post_id?: string | null
-          written_created_at?: string | null
         }
         Relationships: []
       }
